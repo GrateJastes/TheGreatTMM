@@ -1,60 +1,78 @@
+import sys
 from cv2 import cv2
 import numpy as np
 
-
-def minimize(img, scale):
-    return cv2.resize(img, (int(img.shape[1] / scale), int(img.shape[0] / scale)), cv2.INTER_AREA)
-
-
-def find_red_marker(image):
-    blurred = cv2.GaussianBlur(image, (3, 3), 0)
-
-
-def show(header, img):
-    cv2.imshow(header, img)
-    cv2.waitKey(0)
+from consts.consts import MyConsts as consts
+from utils.utils import minimize, show
 
 
 def main():
-    img = cv2.imread('../assets/test2.jpg', cv2.IMREAD_COLOR)
+    cv2.namedWindow('result')
+    cap = cv2.VideoCapture('assets/video/test.mp4')
+
+    while True:
+        flag, frame = cap.read()
+        if not flag:
+            break
+
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        marker = cv2.inRange(hsv, consts.HSV.LOWER_BLUE, consts.HSV.UPPER_BLUE)
+
+        moments = cv2.moments(marker)
+        dM01 = moments['m01']
+        dM10 = moments['m10']
+        dArea = moments['m00']
+
+        if dArea > 100:
+            x = int(dM10 / dArea)
+            y = int(dM01 / dArea)
+            cv2.circle(frame, (x, y), 5, consts.Color.YELLOW, 2)
+            cv2.putText(frame, '%d-%d' % (x, y), (x + 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, consts.Color.YELLOW, 1)
+
+        cv2.imshow('result', frame)
+        ch = cv2.waitKey(5)
+        if ch == 27:
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+# main()
+
+def make_contours():
+    img = cv2.imread('assets/test.jpg', cv2.IMREAD_COLOR)
     img = minimize(img, 2.5)
-    # cropped = img[182:545, 60:470]
+    img = cv2.medianBlur(img, 7)
     show('start', img)
 
-    result = img.copy()
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    lower_red = np.array([0, 200, 0])
-    upper_red = np.array([10, 255, 255])
-    mask_red = cv2.inRange(img, lower_red, upper_red)
-    # result = cv2.bitwise_and(src=result, mask=mask)
-    lower_blue = np.array([110, 150, 0])
-    upper_blue = np.array([130, 255, 255])
-    mask_blue = cv2.inRange(img, lower_blue, upper_blue)
+    h, w = img.shape[:2]
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    marker = cv2.inRange(hsv, consts.HSV.LOWER_BLUE, consts.HSV.UPPER_BLUE)
+    # marker = cv2.medianBlur(marker, 7)
+    show('marker', marker)
 
-    show('mask red', mask_red)
-    show('mask blue', mask_blue)
-    # show('result', result)
+    circles = cv2.HoughCircles(marker, cv2.HOUGH_GRADIENT, 2, 15, param1=30, param2=90, minRadius=0, maxRadius=-1)
 
+    if circles is not None:
+        x = 0
+        y = 0
 
-    # b, g, r = cv2.split(cropped)
+        for c in circles[0]:
+            print(c)
+            x = int(c[0])
+            y = int(c[1])
+            cv2.circle(img, (x, y), 3, consts.Color.YELLOW, -1)
+            cv2.circle(img, (x, y), int(c[2]), consts.Color.YELLOW, 3)
+
+    show('new', img)
+    # contours, hierarchy = cv2.findContours(marker.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     #
-    # _, thresh_b = cv2.threshold(b, 70, 255, cv2.THRESH_BINARY)
-    # _, thresh_g = cv2.threshold(g, 70, 255, cv2.THRESH_BINARY)
-    # _, thresh_r = cv2.threshold(r, 100, 255, cv2.THRESH_BINARY)
+    # cv2.drawContours(img, contours, -1, consts.Color.YELLOW, 2, cv2.LINE_AA)
+    # cv2.imshow('contours', img)
     #
-    # show('r', r)
-    # show('thresh_r', thresh_r)
-    # # show('g', g)
-    # # show('b', b)
-    # # show('thresh_b', thresh_b)
-    # # show('thresh_g', thresh_g)
-    #
-    # merged = cv2.merge([b, g, thresh_r])
-    # _, _, only_red = cv2.split(merged)
-    # _, red_marker = cv2.threshold(only_red, 254, 255, cv2.THRESH_BINARY_INV)
-    #
-    # show('merged', merged)
-    # show('only red', only_red)
+    # cv2.waitKey()
+    cv2.destroyAllWindows()
 
 
-main()
+make_contours()
