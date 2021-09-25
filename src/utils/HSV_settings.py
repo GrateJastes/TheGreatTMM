@@ -9,8 +9,8 @@ def main():
     cv2.namedWindow('settings')
     create_trackers('settings')
 
-    img = cv2.imread('assets/test4.jpg', cv2.IMREAD_COLOR)
-    # img = minimize(img, 2.5)
+    img = cv2.imread('assets/test.jpg', cv2.IMREAD_COLOR)
+    img = minimize(img, 2.5)
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     while True:
