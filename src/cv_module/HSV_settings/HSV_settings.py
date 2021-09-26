@@ -1,16 +1,19 @@
-from cv2 import cv2
 import numpy as np
 
 from settings_utils import *
+from .. import consts
+from .. import cv_utils
 
 
-def main():
+FRAME_TIME = 50
+
+
+def hsv_settings(img):
     cv2.namedWindow('result')
     cv2.namedWindow('settings')
     create_trackers('settings')
+    cv_utils.show('result', img)
 
-    img = cv2.imread('assets/test.jpg', cv2.IMREAD_COLOR)
-    img = minimize(img, 2.5)
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     while True:
@@ -22,11 +25,9 @@ def main():
         thresh = cv2.inRange(hsv, h_min, h_max)
 
         cv2.imshow('result', thresh)
-        ch = cv2.waitKey(50)
-        if ch == 27:
+        ch = cv2.waitKey(FRAME_TIME)
+        if ch == consts.ESC_KEY_CODE:
             break
 
-    cv2.destroyAllWindows()
-
-
-main()
+    cv2.destroyWindow('result')
+    cv2.destroyWindow('settings')
