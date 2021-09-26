@@ -12,6 +12,7 @@ class BGR:
     YELLOW = (0, 255, 255)
     BLUE = (255, 0, 0)
     RED = (0, 0, 255)
+    GREEN = (0, 255, 0)
 
 
 ESC_KEY_CODE = 27
@@ -29,3 +30,8 @@ MORPH_CLOSE_KERNEL = np.ones((9, 9), np.uint8)
 
 
 JUMP_THRESHOLD = 200
+
+ARUCO_MARKER_ID = 42
+
+INITIAL_MARKER_COLOR = BGR.RED
+DESIRED_MARKER_COLOR = BGR.BLUE

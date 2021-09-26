@@ -7,6 +7,6 @@ class Dot:
 
 
 class AnalogDot(Dot):
-    def __init__(self, dot, omega):
-        super().__init__(dot.x, dot.y)
+    def __init__(self, coords, omega):
+        super().__init__(coords[0], coords[1])
         self.omega = omega
