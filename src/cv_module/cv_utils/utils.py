@@ -13,8 +13,6 @@ __all__ = ['minimize',
            'prepare_frame',
            'path_jump_detected',
            'find_aruco_origin',
-           'research_initial_link',
-           'research_desired_link',
            'research_link',
            ]
 
