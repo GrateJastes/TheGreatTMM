@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from src.cv_module import consts
 from src.cv_module.cv_utils import *
 from src import common
+from src.exceptions.cv_exceptions import *
 
 
 def main():

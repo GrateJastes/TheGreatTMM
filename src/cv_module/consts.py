@@ -35,3 +35,14 @@ ARUCO_MARKER_ID = 42
 
 INITIAL_MARKER_COLOR = BGR.RED
 DESIRED_MARKER_COLOR = BGR.BLUE
+
+MIN_FPS_REQUIRED = 30
+MIN_FRAMES_COUNT = 100
+
+
+def get_bound_colors(color):
+    return {
+        BGR.RED: (HSV.LOWER_RED, HSV.UPPER_RED),
+        BGR.BLUE: (HSV.LOWER_BLUE, HSV.UPPER_BLUE),
+    }.get(color)
+

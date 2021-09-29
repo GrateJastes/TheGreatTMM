@@ -13,9 +13,11 @@ __all__ = ['minimize',
            'prepare_frame',
            'path_jump_detected',
            'find_aruco_origin',
-           'research_initial_link',
-           'research_desired_link',
-           'research_link',
+           'find_marker_signatures',
+           'traverse_coordinates',
+           'ellipse_area',
+           'find_closest',
+           'find_omega',
            ]
 
 
@@ -90,12 +92,7 @@ def find_marker(contours):
     return marker_found, (int(marker[0][0]), int(marker[0][1]))
 
 
-def prepare_frame(frame, marker_color):
-    hsv_bounds = {
-        consts.BGR.RED: (consts.HSV.LOWER_RED, consts.HSV.UPPER_RED),
-        consts.BGR.BLUE: (consts.HSV.LOWER_BLUE, consts.HSV.UPPER_BLUE),
-    }.get(marker_color)
-
+def prepare_frame(frame, hsv_bounds):
     blurred = cv2.medianBlur(frame, consts.MEDIAN_PREP_KERNEL)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     binary = cv2.inRange(hsv, hsv_bounds[0], hsv_bounds[1])
@@ -166,7 +163,7 @@ def find_omega(desired_dot):
     return omega
 
 
-def research_link(start_frame, origin, link, omega=None):
+def researsch_link(start_frame, origin, link, omega=None):
     marker_color = consts.DESIRED_MARKER_COLOR if omega else consts.INITIAL_MARKER_COLOR
     circle_color = consts.BGR.GREEN if omega else consts.BGR.YELLOW
 
@@ -187,3 +184,18 @@ def research_link(start_frame, origin, link, omega=None):
         link.path.dots.append(common.AnalogDot((None, None), None))
 
     return marker_found, omega
+
+
+def find_closest(last_dot, candidates):
+    total_min = None
+    result = None
+    for candidate in candidates:
+        if candidate is None:
+            continue
+
+        dist = math.sqrt((candidate[0] - last_dot[0]) ** 2 + (candidate[1] - last_dot[1]) ** 2)
+        if total_min is None or dist < total_min:
+            total_min = dist
+            result = candidate
+
+    return result
