@@ -12,3 +12,19 @@ def interpolate(path, base_path, step):
                             numpy.interp(i, [dot.omega for dot in base_path.dots],
                                          [dot.y for dot in path.dots], period=2*math.pi)])
     return ip_dot_list
+
+
+def diff1(path, base_path, step):
+    ip_dot_list = interpolate(path, base_path, step)
+    v_list = []
+    v_q_x = (-1.5 * ip_dot_list[0][0] + 2 * ip_dot_list[1][0] - 0.5 * ip_dot_list[2][0]) / step
+    v_q_y = (-1.5 * ip_dot_list[0][1] + 2 * ip_dot_list[1][1] - 0.5 * ip_dot_list[2][1]) / step
+    v_list.append([v_q_x, v_q_y])
+    for i in range(1, len(ip_dot_list) - 1-1):
+        v_q_x = (-0.5 * ip_dot_list[i - 1][0] + 0.5 * ip_dot_list[i + 1][0]) / step
+        v_q_y = (-0.5 * ip_dot_list[i - 1][1] + 0.5 * ip_dot_list[i + 1][1]) / step
+        v_list.append([v_q_x, v_q_y])
+    v_q_x = (0.5 * ip_dot_list[-3][0] - 2 * ip_dot_list[-2][0] + 1.5 * ip_dot_list[-1][0]) / step
+    v_q_y = (0.5 * ip_dot_list[-3][1] - 2 * ip_dot_list[-2][1] + 1.5 * ip_dot_list[-1][1]) / step
+    v_list.append([v_q_x, v_q_y])
+    return v_list

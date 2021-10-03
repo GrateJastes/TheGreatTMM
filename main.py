@@ -1,6 +1,7 @@
 import math
 
 import cv2.aruco
+import numpy
 from cv2 import cv2
 import matplotlib.pyplot as plt
 
@@ -50,8 +51,17 @@ def main():
     plt.plot([dot.x for dot in initial_link.path.dots], [dot.y for dot in initial_link.path.dots])
     plt.show()
 
-    inter_scale = diff_utils.interpolate(initial_link.path, initial_link.path, math.pi / 10)
+    step = math.pi / 18
+    inter_scale = diff_utils.interpolate(initial_link.path, initial_link.path, step)
     plt.plot([dot[0] for dot in inter_scale], [dot[1] for dot in inter_scale])
+    plt.show()
+
+    v_scale = diff_utils.diff1(initial_link.path, initial_link.path, step)
+    plt.plot([item * step for item in range(len(v_scale))], [dot[0] for dot in v_scale])
+    plt.show()
+
+    v_scale = diff_utils.diff1(initial_link.path, initial_link.path, step)
+    plt.plot([item * step for item in range(len(v_scale))], [dot[1] for dot in v_scale])
     plt.show()
 
     cv2.waitKey(0)
