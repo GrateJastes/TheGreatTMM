@@ -19,7 +19,7 @@ def main():
     desired_link = common.Point('B')
 
     cv2.namedWindow('way')
-    cap = cv2.VideoCapture('assets/video/test5.mp4')
+    cap = cv2.VideoCapture('assets/video/test1.mp4')
     missed_in_a_row = 0
     while True:
         if missed_in_a_row >= 10:
@@ -51,7 +51,7 @@ def main():
     plt.plot([dot.x for dot in initial_link.path.dots], [dot.y for dot in initial_link.path.dots])
     plt.show()
 
-    step = math.pi / 18
+    step = math.pi / 40
     inter_scale = diff_utils.interpolate(initial_link.path, initial_link.path, step)
     plt.plot([dot[0] for dot in inter_scale], [dot[1] for dot in inter_scale])
     plt.show()
@@ -60,8 +60,16 @@ def main():
     plt.plot([item * step for item in range(len(v_scale))], [dot[0] for dot in v_scale])
     plt.show()
 
-    v_scale = diff_utils.diff1(initial_link.path, initial_link.path, step)
     plt.plot([item * step for item in range(len(v_scale))], [dot[1] for dot in v_scale])
+    plt.show()
+
+    step = math.pi / 18
+
+    a_scale = diff_utils.diff2(initial_link.path, initial_link.path, step)
+    plt.plot([item * step for item in range(len(a_scale))], [dot[0] for dot in a_scale])
+    plt.show()
+
+    plt.plot([item * step for item in range(len(a_scale))], [dot[1] for dot in a_scale])
     plt.show()
 
     cv2.waitKey(0)
