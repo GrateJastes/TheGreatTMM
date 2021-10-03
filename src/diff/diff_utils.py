@@ -41,6 +41,6 @@ def diff2(path, base_path, step):
         a_q_y = (ip_dot_list[i - 1][1] - 2 * ip_dot_list[i][1] + 1 * ip_dot_list[i + 1][1]) / (step ** 2)
         a_list.append([a_q_x, a_q_y])
     a_q_x = (- ip_dot_list[-4][0] + 4 * ip_dot_list[-3][0] - 5 * ip_dot_list[-2][0] + 2 * ip_dot_list[-1][0]) / (step ** 2)
-    a_q_x = (- ip_dot_list[-4][1] + 4 * ip_dot_list[-3][1] - 5 * ip_dot_list[-2][1] + 2 * ip_dot_list[-1][1]) / (step ** 2)
+    a_q_y = (- ip_dot_list[-4][1] + 4 * ip_dot_list[-3][1] - 5 * ip_dot_list[-2][1] + 2 * ip_dot_list[-1][1]) / (step ** 2)
     a_list.append([a_q_x, a_q_y])
     return a_list
