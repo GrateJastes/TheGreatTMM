@@ -152,14 +152,7 @@ def find_omega(desired_dot):
     x = desired_dot[0]
     y = desired_dot[1]
 
-    omega = {
-        x > 0 and y >= 0: math.atan(y / x),
-        x > 0 and y < 0: math.atan(y / x) + 2 * math.pi,
-        x < 0: math.atan(y / x) + math.pi,
-        x == 0 and y > 0: math.pi / 2,
-        x == 0 and y < 0: - math.pi / 2,
-        x == 0 and y == 0: None,
-    }.get(True)
+    omega = math.atan2(y, x)
 
     return omega
 

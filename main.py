@@ -1,3 +1,5 @@
+import math
+
 import cv2.aruco
 from cv2 import cv2
 import matplotlib.pyplot as plt
@@ -5,6 +7,7 @@ import matplotlib.pyplot as plt
 from src.cv_module import consts
 from src.cv_module.cv_utils import *
 from src import common
+from src.diff import diff_utils
 
 
 def main():
@@ -46,6 +49,11 @@ def main():
 
     plt.plot([dot.x for dot in initial_link.path.dots], [dot.y for dot in initial_link.path.dots])
     plt.show()
+
+    inter_scale = diff_utils.interpolate(initial_link.path, initial_link.path, math.pi / 10)
+    plt.plot([dot[0] for dot in inter_scale], [dot[1] for dot in inter_scale])
+    plt.show()
+
     cv2.waitKey(0)
 
     cap.release()
