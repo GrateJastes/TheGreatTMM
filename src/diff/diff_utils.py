@@ -1,4 +1,5 @@
 import math
+import findiff
 import matplotlib.pyplot as plt
 import numpy
 from .. import common
@@ -40,7 +41,20 @@ def diff2(path, base_path, step):
         a_q_x = (ip_dot_list[i - 1][0] - 2 * ip_dot_list[i][0] + 1 * ip_dot_list[i + 1][0]) / (step ** 2)
         a_q_y = (ip_dot_list[i - 1][1] - 2 * ip_dot_list[i][1] + 1 * ip_dot_list[i + 1][1]) / (step ** 2)
         a_list.append([a_q_x, a_q_y])
-    a_q_x = (- ip_dot_list[-4][0] + 4 * ip_dot_list[-3][0] - 5 * ip_dot_list[-2][0] + 2 * ip_dot_list[-1][0]) / (step ** 2)
-    a_q_y = (- ip_dot_list[-4][1] + 4 * ip_dot_list[-3][1] - 5 * ip_dot_list[-2][1] + 2 * ip_dot_list[-1][1]) / (step ** 2)
+    a_q_x = (- ip_dot_list[-4][0] + 4 * ip_dot_list[-3][0] - 5 * ip_dot_list[-2][0] +
+             2 * ip_dot_list[-1][0]) / (step ** 2)
+    a_q_y = (- ip_dot_list[-4][1] + 4 * ip_dot_list[-3][1] - 5 * ip_dot_list[-2][1] +
+             2 * ip_dot_list[-1][1]) / (step ** 2)
     a_list.append([a_q_x, a_q_y])
     return a_list
+
+
+def diff2_fd(path, base_path, step):
+    ip_dot_list = interpolate(path, base_path, step)
+    a_list = []
+    d_do = findiff.FinDiff(0, step, 2)
+    x_array = numpy.array([dot[0] for dot in ip_dot_list])
+    y_array = numpy.array([dot[1] for dot in ip_dot_list])
+    dx_do = d_do(x_array)
+    dy_do = d_do(y_array)
+    return [[dx_do[i], dy_do[i]] for i in range(len(dx_do))]

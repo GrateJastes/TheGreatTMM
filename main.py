@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 
 from src.cv_module import consts
 from src.cv_module.cv_utils import *
-from src import common
 from src.diff import diff_utils
 
 
@@ -48,28 +47,54 @@ def main():
         if ch == consts.ESC_KEY_CODE:
             break
 
+    plt.title('Результат распознавания')
     plt.plot([dot.x for dot in initial_link.path.dots], [dot.y for dot in initial_link.path.dots])
+    plt.xlabel("x")
+    plt.ylabel("y")
     plt.show()
 
     step = math.pi / 40
     inter_scale = diff_utils.interpolate(initial_link.path, initial_link.path, step)
+
+    plt.title('Траектория с учетом интерполяции')
     plt.plot([dot[0] for dot in inter_scale], [dot[1] for dot in inter_scale])
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.grid(True)
     plt.show()
 
     v_scale = diff_utils.diff1(initial_link.path, initial_link.path, step)
+
+    plt.subplot(211)
+    plt.title('Цикловые графики аналогов скоростей')
     plt.plot([item * step for item in range(len(v_scale))], [dot[0] for dot in v_scale])
-    plt.show()
+    plt.ylabel("v_x")
+    plt.grid(True)
 
+    plt.subplot(212)
     plt.plot([item * step for item in range(len(v_scale))], [dot[1] for dot in v_scale])
+    plt.xlabel("phi")
+    plt.ylabel("v_y")
+    plt.grid(True)
+
     plt.show()
 
-    step = math.pi / 18
+    step = math.pi / 11
 
-    a_scale = diff_utils.diff2(initial_link.path, initial_link.path, step)
+    a_scale = diff_utils.diff2_fd(initial_link.path, initial_link.path, step)
+
+    plt.subplot(211)
     plt.plot([item * step for item in range(len(a_scale))], [dot[0] for dot in a_scale])
-    plt.show()
+    plt.title('Цикловые графики аналогов ускорений')
+    plt.ylabel("a_x")
+    plt.grid(True)
 
+    plt.subplot(212)
     plt.plot([item * step for item in range(len(a_scale))], [dot[1] for dot in a_scale])
+    plt.xlabel("phi")
+    plt.ylabel("a_y")
+    plt.grid(True)
+
     plt.show()
 
     cv2.waitKey(0)
