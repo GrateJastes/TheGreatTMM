@@ -5,6 +5,7 @@ import numpy
 from cv2 import cv2
 import matplotlib.pyplot as plt
 
+from src import common
 from src.cv_module import consts
 from src.cv_module.cv_utils import *
 from src.diff import diff_utils
@@ -54,16 +55,16 @@ def main():
     plt.show()
 
     step = math.pi / 40
-    inter_scale = diff_utils.interpolate(initial_link.path, initial_link.path, step)
+    inter_scale = diff_utils.interpolate(initial_link, initial_link, step)
 
     plt.title('Траектория с учетом интерполяции')
-    plt.plot([dot[0] for dot in inter_scale], [dot[1] for dot in inter_scale])
+    plt.plot([dot.x for dot in inter_scale.path.dots], [dot.y for dot in inter_scale.path.dots])
     plt.xlabel("x")
     plt.ylabel("y")
     plt.grid(True)
     plt.show()
 
-    v_scale = diff_utils.diff1(initial_link.path, initial_link.path, step)
+    v_scale = diff_utils.diff1(initial_link, initial_link, step)
 
     plt.subplot(211)
     plt.title('Цикловые графики аналогов скоростей')
@@ -81,7 +82,7 @@ def main():
 
     step = math.pi / 11
 
-    a_scale = diff_utils.diff2_fd(initial_link.path, initial_link.path, step)
+    a_scale = diff_utils.diff2(initial_link, initial_link, step)
 
     plt.subplot(211)
     plt.plot([item * step for item in range(len(a_scale))], [dot[0] for dot in a_scale])
