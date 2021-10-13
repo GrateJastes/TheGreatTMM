@@ -1,14 +1,13 @@
 import math
 
 import cv2.aruco
-import numpy
 from cv2 import cv2
-import matplotlib.pyplot as plt
 
 from src import common
 from src.cv_module import consts
 from src.cv_module.cv_utils import *
 from src.diff import diff_utils
+from src.mpl_graphs import graphs
 
 
 def main():
@@ -48,64 +47,25 @@ def main():
         if ch == consts.ESC_KEY_CODE:
             break
 
-    plt.title('Результат распознавания')
-    plt.plot([dot.x for dot in initial_link.path.dots], [dot.y for dot in initial_link.path.dots])
-    plt.plot([dot.x for dot in desired_link.path.dots], [dot.y for dot in desired_link.path.dots])
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.show()
+    graphs.print_path(initial_link, desired_link)
 
     step = math.pi / 40
     inter_scale = diff_utils.interpolate(initial_link, initial_link, step)
     desired_scale = diff_utils.interpolate(desired_link, initial_link, step)
 
-    plt.title('Траектория с учетом интерполяции')
-    plt.plot([dot.x for dot in inter_scale.path.dots], [dot.y for dot in inter_scale.path.dots])
-    plt.plot([dot.x for dot in desired_scale.path.dots], [dot.y for dot in desired_scale.path.dots])
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.grid(True)
-    plt.show()
+    graphs.print_path(inter_scale, desired_scale)
 
     v_scale = diff_utils.diff1(initial_link, initial_link, step)
     v_scale_d = diff_utils.diff1(desired_link, initial_link, step)
 
-    plt.subplot(211)
-    plt.title('Цикловые графики аналогов скоростей')
-    plt.plot([item * step for item in range(len(v_scale))], [dot[0] for dot in v_scale])
-    plt.plot([item * step for item in range(len(v_scale_d))], [dot[0] for dot in v_scale_d])
-    plt.ylabel("v_x")
-    plt.grid(True)
-
-    plt.subplot(212)
-    plt.plot([item * step for item in range(len(v_scale))], [dot[1] for dot in v_scale])
-    plt.plot([item * step for item in range(len(v_scale_d))], [dot[1] for dot in v_scale_d])
-    plt.xlabel("phi")
-    plt.ylabel("v_y")
-    plt.grid(True)
-
-    plt.show()
+    graphs.print_analog('v', step, v_scale, v_scale_d)
 
     step = math.pi / 11
 
     a_scale = diff_utils.diff2(initial_link, initial_link, step)
     a_scale_d = diff_utils.diff2(desired_link, initial_link, step)
 
-    plt.subplot(211)
-    plt.plot([item * step for item in range(len(a_scale))], [dot[0] for dot in a_scale])
-    plt.plot([item * step for item in range(len(a_scale_d))], [dot[0] for dot in a_scale_d])
-    plt.title('Цикловые графики аналогов ускорений')
-    plt.ylabel("a_x")
-    plt.grid(True)
-
-    plt.subplot(212)
-    plt.plot([item * step for item in range(len(a_scale))], [dot[1] for dot in a_scale])
-    plt.plot([item * step for item in range(len(a_scale_d))], [dot[1] for dot in a_scale_d])
-    plt.xlabel("phi")
-    plt.ylabel("a_y")
-    plt.grid(True)
-
-    plt.show()
+    graphs.print_analog('a', step, a_scale, a_scale_d)
 
     cv2.waitKey(0)
 
