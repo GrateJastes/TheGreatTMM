@@ -63,6 +63,7 @@ def find_marker_signatures(contours):
                 continue
 
             signatures.append(ellipse)
+    # print(signatures)
     return signatures
 
 
@@ -163,7 +164,7 @@ def find_omega(desired_dot):
     return omega
 
 
-def researsch_link(start_frame, origin, link, omega=None):
+def research_link(start_frame, origin, link, omega=None):
     marker_color = consts.DESIRED_MARKER_COLOR if omega else consts.INITIAL_MARKER_COLOR
     circle_color = consts.BGR.GREEN if omega else consts.BGR.YELLOW
 
