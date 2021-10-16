@@ -4,8 +4,6 @@ from .Dot import AnalogDot
 
 
 class Point:
-    path = [AnalogDot]
-
     def __init__(self, name, is_base=False):
         self.is_base = is_base
         self.name = name

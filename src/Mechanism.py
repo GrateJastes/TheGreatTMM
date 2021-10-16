@@ -1,14 +1,13 @@
-import math
-
 import cv2.aruco
 from cv2 import cv2
-import matplotlib.pyplot as plt
 
 from src.cv_module import consts
+from src.cv_module.cv_utils.aruco_utils import find_aruco_origin
 from src.cv_module.HSV_settings.HSV_settings import hsv_settings
 from src.cv_module.cv_utils import *
 from src import common
 from src.exceptions.cv_exceptions import *
+from src.cv_module.cv_utils.geometry import ellipse_area
 
 
 class Link:
@@ -124,17 +123,23 @@ class Mechanism:
         else:
             self.links.append(link)
 
-    def research(self):
+    def research_input(self):
         missed_in_a_row = 0
         max_missed = 0
+        missed_total = 0
+        frames_num = 0
+        missed_by_aruco = 0
         while True:
             frame_read, start_frame = self.video.read()
+            frames_num += 1
             if not frame_read:
                 break
 
             origin = find_aruco_origin(start_frame, self.aruco_dictionary, self.aruco_parameters)
             if not origin:
                 missed_in_a_row += 1
+                missed_by_aruco += 1
+                missed_total += 1
                 if self.debug_mode == consts.DebugMode.DEBUG_FULL:
                     show('debug', start_frame)
                 continue
@@ -142,6 +147,7 @@ class Mechanism:
             initial_ok, omega = self.initial_link.research_link(start_frame, origin)
             if not initial_ok or not omega:
                 missed_in_a_row += 1
+                missed_total += 1
 
                 if self.debug_mode == consts.DebugMode.DEBUG_FULL:
                     hsv_settings(start_frame, self.initial_link.color_bounds)
@@ -151,12 +157,13 @@ class Mechanism:
                 link_ok, _ = link.research_link(start_frame, origin, omega)
                 if not link_ok:
                     missed_in_a_row += 1
+                    missed_total += 1
                     if self.debug_mode == consts.DebugMode.DEBUG_FULL:
                         hsv_settings(start_frame, link.color_bounds)
 
             if missed_in_a_row > max_missed:
                 max_missed = missed_in_a_row
-            max_missed = 0
+            missed_in_a_row = 0
 
             if self.debug_mode != consts.DebugMode.DEBUG_OFF:
                 cv2.imshow('debug', start_frame)
@@ -164,24 +171,8 @@ class Mechanism:
                 if ch == consts.ESC_KEY_CODE:
                     break
 
-
-def main():
-    mech = Mechanism('assets/video/test5.mp4', consts.DebugMode.DEBUG_FULL)
-    mech.set_new_link(consts.BGR.RED, [common.Point('A', True)], True)
-    mech.set_new_link(consts.BGR.BLUE, [common.Point('B', False)], False)
-
-    mech.research()
-
-    pathA = mech.initial_link.points[0].path.dots
-    for idx, dot in enumerate(pathA):
-        if idx == 0:
-            continue
-        if math.sqrt((dot.x - pathA[idx - 1].x) ** 2 + (dot.y - pathA[idx - 1].y) ** 2) > 10:
-            pathA.remove(dot)
-
-    plt.plot([dot.x for dot in pathA], [dot.y for dot in pathA])
-    plt.show()
-    cv2.waitKey(0)
-
-
-main()
+        if self.debug_mode != consts.DebugMode.DEBUG_OFF:
+            print('frames: ', frames_num)
+            print('final dots: ', len(self.initial_link.points[0].path.dots))
+            print('total missed: ', missed_total)
+            print('missed by aruco: ', missed_by_aruco)

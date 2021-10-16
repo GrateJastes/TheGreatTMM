@@ -1,21 +1,17 @@
 import math
-from statistics import mean
 
-import numpy as np
 from cv2 import cv2
 
 from .. import consts
-from ... import common
+from .geometry import bad_circle, bad_ellipse_fitting, ellipse_area
 
 __all__ = ['minimize',
            'show',
            'find_marker',
            'prepare_frame',
            'path_jump_detected',
-           'find_aruco_origin',
            'find_marker_signatures',
            'traverse_coordinates',
-           'ellipse_area',
            'find_closest',
            'find_omega',
            ]
@@ -30,30 +26,6 @@ def show(header, img):
     cv2.waitKey()
 
 
-def ellipse_area(ellipse):
-    return math.pi * ellipse[1][0] * ellipse[1][1] / 4
-
-
-def eccentricity(ellipse):
-    a = ellipse[1][1] / 2
-    b = ellipse[1][0] / 2
-    c = np.sqrt(a ** 2 - b ** 2)
-    return c / a
-
-
-def bad_ellipse_fitting(ellipse, cnt):
-    area_c = cv2.contourArea(cnt)
-    area_e = ellipse_area(ellipse)
-    diff = np.abs(area_e - area_c)
-    middle_area = mean([area_c, area_e])
-
-    return diff / middle_area > consts.MAX_AREAS_DEVIATION
-
-
-def bad_circle(ellipse):
-    return eccentricity(ellipse) > consts.MAX_ECCENTRICITY
-
-
 def find_marker_signatures(contours):
     signatures = []
     for cnt in contours:
@@ -63,7 +35,6 @@ def find_marker_signatures(contours):
                 continue
 
             signatures.append(ellipse)
-    # print(signatures)
     return signatures
 
 
@@ -116,31 +87,6 @@ def path_jump_detected(path, marker_dot):
     return dx > consts.JUMP_THRESHOLD or dy > consts.JUMP_THRESHOLD
 
 
-def find_aruco_center(marker_corners):
-    box = np.int0(marker_corners[0][0])
-    m10 = 0
-    m01 = 0
-    m00 = len(box)
-
-    for dot in box:
-        m10 += dot[0]
-        m01 += dot[1]
-
-    centerX = m10 / m00
-    centerY = m01 / m00
-
-    return int(centerX), int(centerY)
-
-
-def find_aruco_origin(frame, dictionary, parameters):
-    marker_corners, marker_ids, _ = cv2.aruco.detectMarkers(frame, dictionary, parameters=parameters)
-    if len(marker_ids) != 1 or marker_ids[0] != consts.ARUCO_MARKER_ID:
-        return None
-    origin = find_aruco_center(marker_corners)
-
-    return origin
-
-
 def traverse_coordinates(desired_dot, origin):
     newX = desired_dot[0] - origin[0]
     newY = - desired_dot[1] + origin[1]
@@ -162,29 +108,6 @@ def find_omega(desired_dot):
     }.get(True)
 
     return omega
-
-
-def research_link(start_frame, origin, link, omega=None):
-    marker_color = consts.DESIRED_MARKER_COLOR if omega else consts.INITIAL_MARKER_COLOR
-    circle_color = consts.BGR.GREEN if omega else consts.BGR.YELLOW
-
-    frame = prepare_frame(start_frame, marker_color)
-    contours, _ = cv2.findContours(frame, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    marker_found, marker_dot = find_marker(contours)
-
-    if marker_found:
-        coords = traverse_coordinates(marker_dot, origin)
-        cv2.circle(start_frame, (int(marker_dot[0]), int(marker_dot[1])), 2, circle_color, 2)
-
-        if not omega:
-            omega = find_omega(coords)
-
-        link.path.dots.append(common.AnalogDot(coords, omega))
-    else:
-        link.path.missed_dots += 1
-        link.path.dots.append(common.AnalogDot((None, None), None))
-
-    return marker_found, omega
 
 
 def find_closest(last_dot, candidates):
