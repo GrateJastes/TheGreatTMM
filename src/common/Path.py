@@ -1,5 +1,4 @@
-import numpy as np
-from .Dot import Dot, AnalogDot
+from .Dot import AnalogDot
 
 
 class Path:

@@ -1,6 +1,4 @@
-import numpy as np
 from .Path import Path
-from .Dot import AnalogDot
 
 
 class Point:
@@ -8,4 +6,3 @@ class Point:
         self.is_base = is_base
         self.name = name
         self.path = Path()
-

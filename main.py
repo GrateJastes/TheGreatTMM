@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from cv2 import cv2
 
 from src import common
-from src.Mechanism import Mechanism
+from src.common.mechanism.Mechanism import Mechanism
 from src.cv_module import consts
 
 

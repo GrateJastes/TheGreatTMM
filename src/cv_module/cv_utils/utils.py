@@ -7,7 +7,6 @@ from .geometry import bad_circle, bad_ellipse_fitting, ellipse_area
 
 __all__ = ['minimize',
            'show',
-           'find_marker',
            'prepare_frame',
            'path_jump_detected',
            'find_marker_signatures',
@@ -36,32 +35,6 @@ def find_marker_signatures(contours):
 
             signatures.append(ellipse)
     return signatures
-
-
-def find_marker(contours):
-    marker_found = False
-    if not contours:
-        return marker_found, None
-
-    if len(contours) == 1:
-        if len(contours[0]) > consts.MIN_POINTS_FOR_ELLIPSE:
-            marker_found = True
-            ellipse = cv2.fitEllipse(contours[0])
-            return marker_found, (int(ellipse[0][0]), int(ellipse[0][1]))
-        return marker_found, None
-
-    signatures = find_marker_signatures(contours)
-
-    if not signatures:
-        return marker_found, None
-
-    if len(signatures) == 1:
-        marker = signatures[0]
-    else:
-        marker = max(signatures, key=ellipse_area)
-    marker_found = True
-
-    return marker_found, (int(marker[0][0]), int(marker[0][1]))
 
 
 def prepare_frame(frame, hsv_bounds):
