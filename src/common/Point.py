@@ -7,5 +7,7 @@ class Point:
         self.is_base = is_base
         self.name = name
         self.path = Path()
+        self.speed = []
+        self.acceleration = []
 
     # def add_trajectory_dot(self, coords, omega):
