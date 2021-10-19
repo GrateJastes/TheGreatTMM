@@ -4,6 +4,7 @@ import numpy as np
 
 from .. import common
 from ..common.Unit import Unit
+from ..mpl_graphs import graphs
 
 
 def interpolate(point, base, step):
@@ -59,8 +60,18 @@ def diff2(point, base, step):
     a_list.append(Unit(a_q_x, a_q_y))
     return a_list
 
+
 # Returns a polynomial function of dependence of y on x
 def polinom(x, y):
     z = np.polyfit(x, y, 6)
     p = np.poly1d(z)
     return p
+
+
+def point_analysis(base, *points):
+    step = math.pi / 13
+    for point in points:
+        point.speed = diff1(point, base, step)
+        point.acceleration = diff2(point, base, step)
+    graphs.print_analog_v(step, *points)
+    graphs.print_analog_a(step, *points)

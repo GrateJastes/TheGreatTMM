@@ -49,23 +49,12 @@ def main():
 
     graphs.print_path(initial_link, desired_link)
 
-    step = math.pi / 15
+    step = math.pi / 13
     inter_scale = diff_utils.interpolate(initial_link, initial_link, step)
     desired_scale = diff_utils.interpolate(desired_link, initial_link, step)
-
     graphs.print_path(inter_scale, desired_scale)
 
-    initial_link.speed = diff_utils.diff1(initial_link, initial_link, step)
-    desired_link.speed = diff_utils.diff1(desired_link, initial_link, step)
-
-    graphs.print_analog_v(step, initial_link, desired_link)
-
-    step = math.pi / 13
-
-    initial_link.acceleration = diff_utils.diff2(initial_link, initial_link, step)
-    desired_link.acceleration = diff_utils.diff2(desired_link, initial_link, step)
-
-    graphs.print_analog_a(step, initial_link, desired_link)
+    diff_utils.point_analysis(initial_link, initial_link, desired_link)
 
     cv2.waitKey(0)
 
