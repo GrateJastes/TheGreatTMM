@@ -3,3 +3,4 @@
 .epydoc-env
 assets
 **/__pycache__
+venv

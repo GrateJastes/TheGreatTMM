@@ -1,4 +1,3 @@
-import numpy as np
 from .Path import Path
 
 
@@ -9,5 +8,3 @@ class Point:
         self.path = Path()
         self.speed = []
         self.acceleration = []
-
-    # def add_trajectory_dot(self, coords, omega):
