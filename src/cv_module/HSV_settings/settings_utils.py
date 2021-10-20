@@ -5,13 +5,13 @@ def noop(*arg):
     pass
 
 
-def create_trackers(window_name):
-    cv2.createTrackbar('h1', window_name, 0, 255, noop)
-    cv2.createTrackbar('s1', window_name, 0, 255, noop)
-    cv2.createTrackbar('v1', window_name, 0, 255, noop)
-    cv2.createTrackbar('h2', window_name, 255, 255, noop)
-    cv2.createTrackbar('s2', window_name, 255, 255, noop)
-    cv2.createTrackbar('v2', window_name, 255, 255, noop)
+def create_trackers(window_name, color_bounds):
+    cv2.createTrackbar('h1', window_name, color_bounds[0][0], 255, noop)
+    cv2.createTrackbar('s1', window_name, color_bounds[0][1], 255, noop)
+    cv2.createTrackbar('v1', window_name, color_bounds[0][2], 255, noop)
+    cv2.createTrackbar('h2', window_name, color_bounds[1][0], 255, noop)
+    cv2.createTrackbar('s2', window_name, color_bounds[1][1], 255, noop)
+    cv2.createTrackbar('v2', window_name, color_bounds[1][2], 255, noop)
 
 
 def get_trackers_info(window_name):

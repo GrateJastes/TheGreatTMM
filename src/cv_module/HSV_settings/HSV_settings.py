@@ -1,6 +1,6 @@
 import numpy as np
 
-from settings_utils import *
+from .settings_utils import *
 from .. import consts
 from .. import cv_utils
 
@@ -8,10 +8,12 @@ from .. import cv_utils
 FRAME_TIME = 50
 
 
-def hsv_settings(img):
+def hsv_settings(img, color_bounds):
     cv2.namedWindow('result')
     cv2.namedWindow('settings')
-    create_trackers('settings')
+
+    create_trackers('settings', color_bounds)
+
     cv_utils.show('result', img)
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
