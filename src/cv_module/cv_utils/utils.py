@@ -9,10 +9,8 @@ __all__ = ['minimize',
            'show',
            'prepare_frame',
            'path_jump_detected',
-           'find_marker_signatures',
-           'traverse_coordinates',
-           'find_closest',
-           'find_omega',
+           'find_aruco_origin',
+           'research_link',
            ]
 
 
