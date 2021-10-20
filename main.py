@@ -1,5 +1,4 @@
 import math
-
 import matplotlib.pyplot as plt
 from cv2 import cv2
 
@@ -21,10 +20,8 @@ def main():
             continue
         if math.sqrt((dot.x - pathA[idx - 1].x) ** 2 + (dot.y - pathA[idx - 1].y) ** 2) > 10:
             pathA.remove(dot)
-
     plt.plot([dot.x for dot in pathA], [dot.y for dot in pathA])
     plt.show()
     cv2.waitKey(0)
-
 
 main()
