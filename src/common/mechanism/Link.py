@@ -2,7 +2,7 @@ from cv2 import cv2
 
 from src import common
 from src.cv_module import consts
-from src.cv_module.cv_utils import prepare_frame, find_marker_signatures, traverse_coordinates, find_omega, find_closest
+from src.cv_module.cv_utils.utils import prepare_frame, find_marker_signatures, traverse_coordinates, find_omega, find_closest
 from src.cv_module.cv_utils.geometry import ellipse_area
 
 
