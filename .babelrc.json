@@ -1,0 +1,24 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "entry",
+        "corejs": {"version": "3.11.1", "proposals": true},
+        "targets": {"chrome": "87"}
+      }
+    ],
+    [
+      "@babel/preset-react"
+    ]
+  ],
+  "plugins": [
+    ["@babel/plugin-proposal-class-properties"],
+    ["@babel/plugin-proposal-private-methods"],
+    ["@babel/plugin-proposal-decorators", {"decoratorsBeforeExport": true}]
+  ],
+  "assumptions": {
+    "setPublicClassFields": true,
+    "privateFieldsAsProperties": true
+  }
+}

@@ -1,0 +1,76 @@
+html {
+  height: 100%;
+  width: 100%;
+
+  max-width: 100%;
+  max-height: 100%;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  margin: 0;
+
+  font-family: var(--font-regular);
+}
+
+.page {
+  height: 100%;
+  width: 100%;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+
+  margin: 0;
+}
+
+#app {
+  height: 100%;
+  width: 100%;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+
+  background-color: var(--background-white);
+}
+
+:root {
+  --white: rgba(255, 255, 255, 1);
+  --background-white: rgba(248, 248, 248, 1);
+  --title-color: #3af2ff;
+  --gray: rgba(169, 169, 169, 1);
+  --black: rgba(37, 37, 37, 1);
+  --perm-white: rgba(255, 255, 255, 1);
+  --lightgreen: green;
+
+  --font-regular: 'Montserrat Regular';
+  --font-medium: 'Montserrat Medium';
+  --font-bold: 'Montserrat Bold';
+}
+
+@font-face {
+  font-family: 'Montserrat Regular';
+  src: url('fonts/Montserrat/Montserrat-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Montserrat Medium';
+  src: url('fonts/Montserrat/Montserrat-Medium.ttf');
+}
+
+@font-face {
+  font-family: 'Montserrat Bold';
+  src: url('fonts/Montserrat/Montserrat-Bold.ttf');
+}
