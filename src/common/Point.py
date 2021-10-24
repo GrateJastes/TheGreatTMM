@@ -1,4 +1,5 @@
 from .Path import Path
+from ..diff import diff_utils
 
 
 class Point:
@@ -8,3 +9,7 @@ class Point:
         self.path = Path()
         self.speed = []
         self.acceleration = []
+
+    def point_analysis(self, base):
+        self.speed = diff_utils.diff1(self, base)
+        self.acceleration = diff_utils.diff2(self, base)

@@ -5,7 +5,6 @@ import numpy as np
 from . import consts
 from .. import common
 from ..common.Unit import Unit
-from ..mpl_graphs import graphs
 
 
 def interpolate(point, base):
@@ -110,11 +109,3 @@ def polinom(x, y):
     z = np.polyfit(x, y, consts.DEGREE_OF_POLYNOMIAL)
     p = np.poly1d(z)
     return p
-
-
-def point_analysis(base, *points):
-    for point in points:
-        point.speed = diff1(point, base)
-        point.acceleration = diff2(point, base)
-    graphs.print_analog_v(*points)
-    graphs.print_analog_a(*points)
