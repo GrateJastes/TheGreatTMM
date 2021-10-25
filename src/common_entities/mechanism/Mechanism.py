@@ -11,6 +11,7 @@ from .Link import Link
 
 # noinspection PyTypeChecker
 class Mechanism:
+    pass
     links = []
     initial_link = Link
 
@@ -23,18 +24,7 @@ class Mechanism:
         self.aruco_dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_5X5_50)
         self.aruco_parameters = cv2.aruco.DetectorParameters_create()
 
-        # Checking if the video meets our requirements
         self.video = cv2.VideoCapture(path_to_file)
-        if not self.video.isOpened():
-            raise FailedToOpenVideo
-
-        fps = self.video.get(cv2.CAP_PROP_FPS)
-        if fps < consts.MIN_FPS_REQUIRED:
-            raise LowFPSVideo
-
-        total_frames = self.video.get(cv2.CAP_PROP_FRAME_COUNT)
-        if total_frames < consts.MIN_FRAMES_COUNT:
-            raise TooShortVideo
 
     def __del__(self):
         self.video.release()
@@ -112,3 +102,22 @@ class Mechanism:
             print('final dots: ', len(self.initial_link.points[0].path.dots))
             print('total missed: ', missed_total)
             print('missed by aruco: ', missed_by_aruco)
+
+    @staticmethod
+    def video_fits(filename: str) -> bool:
+        video = cv2.VideoCapture(filename)
+        try:
+            if not video.isOpened():
+                return False
+
+            fps = video.get(cv2.CAP_PROP_FPS)
+            if fps < consts.MIN_FPS_REQUIRED:
+                return False
+
+            total_frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
+            if total_frames < consts.MIN_FRAMES_COUNT:
+                return False
+
+            return True
+        finally:
+            video.release()
