@@ -1,5 +1,5 @@
-import cv2.aruco
 from cv2 import cv2
+import cv2.aruco
 
 from src.cv_module import consts
 from src.cv_module.cv_utils.aruco_utils import find_aruco_origin
