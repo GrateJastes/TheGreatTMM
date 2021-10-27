@@ -2,20 +2,19 @@ import math
 
 import numpy as np
 
-import consts
-from .. import common_entities
-from ..common_entities.Unit import Unit
-from ..mpl_graphs import graphs
+from src import common_entities
+from src.common_entities.Unit import Unit
+from src.diff import consts
 
 
-def interpolate(point, base, step):
+def interpolate(point, base):
     ip_point = common_entities.Point(point.name + '(ip)')
     dot_list = []
-    for i in np.arange(0, 2 * math.pi + step, step):
+    for i in np.arange(0, 2 * math.pi + consts.STEP_SPLITTING, consts.STEP_SPLITTING):
         dot_list.append(common_entities.Dot(np.interp(i, [dot.omega for dot in base.path.dots],
                                                       [dot.x for dot in point.path.dots], period=2 * math.pi),
                                             np.interp(i, [dot.omega for dot in base.path.dots],
-                                             [dot.y for dot in point.path.dots], period=2 * math.pi)))
+                                                      [dot.y for dot in point.path.dots], period=2 * math.pi)))
     ip_point.path.dots = dot_list
     return ip_point
 

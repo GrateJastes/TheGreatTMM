@@ -5,15 +5,17 @@ from PyQt5.QtWidgets import QFileDialog, QApplication, QMessageBox, QWidget, QVB
     QPushButton
 from matplotlib import pyplot as plt
 
+import src
 from src.common_entities import Point
 from src.common_entities.mechanism.Link import Link
 from src.cv_module import consts
 from src.cv_module.cv_utils import remove_jumps
+from src.diff import consts as diff_consts
 from src.qt.QHline import QHLine
 from src.qt.gen.ApplicationUI import Ui_MainWindow
 from src.common_entities.mechanism.Mechanism import Mechanism
 from src.cv_module.consts import BGR
-from src.windows.PathWindow import PathWindow
+from src.windows.PlotWindow import PlotWindow
 import pyqtgraph as pg
 
 
@@ -29,15 +31,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setWindowTitle('The Great TMM')
         self.form_links = []
         self.link_colors = []
         self.link_names = []
         self.link_points = []
         self.initial_links = []
         self.plot_path_windows = []
+        self.plot_speed_windows = []
         self.mechanism = None
 
         self.researchPathsButton.clicked.connect(self.set_trajectories_page)
+        self.researchAnalogs.clicked.connect(self.set_speeds_page)
 
     def set_screen_geometry(self):
         screen_geometry = QApplication.desktop().screenGeometry()
@@ -45,6 +50,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         y = (screen_geometry.height() - self.height()) / 2
         self.move(x, y)
 
+    # noinspection DuplicatedCode
     def set_navigation(self):
         self.stackedWidget.setCurrentIndex(0)
 
@@ -61,6 +67,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.back_button_6.clicked.connect(self.prev_page)
 
         self.next_button_5.hide()
+        self.next_button_6.hide()
 
     def set_upload_logic(self):
         self.next_button_2.hide()
@@ -246,7 +253,72 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 'Пожалуйста, выберете разные цвета для используемых звеньев'
             )
 
-    def add_link_paths(self, link: Link):
+    def set_trajectories_page(self):
+        self.researchPathsButton.hide()
+        self.add_link_activities(self.mechanism.initial_link, self.show_point_path, self.verticalLayout_11)
+        self.next_button_5.show()
+
+        for link in self.mechanism.links:
+            self.add_link_activities(link, self.show_point_path, self.verticalLayout_11)
+
+    def set_speeds_page(self):
+        self.mechanism.research_analogs()
+        self.researchAnalogs.hide()
+        self.next_button_6.show()
+
+        self.add_link_activities(self.mechanism.initial_link, self.show_point_speeds, self.verticalLayout_12)
+        for link in self.mechanism.links:
+            self.add_link_activities(link, self.show_point_speeds, self.verticalLayout_12)
+
+        pass
+
+    def show_point_path(self, point: Point):
+        def show_path():
+            path = point.path.dots
+            remove_jumps(path)
+            plot_win = PlotWindow()
+            plot_widget = pg.GraphicsLayoutWidget(show=True)
+            pg.setConfigOptions(antialias=True)
+
+            plot_widget.addPlot(title='Point A path', x=[dot.x for dot in path], y=[dot.y for dot in path])
+            plot_win.verticalLayout.addWidget(plot_widget)
+
+            self.plot_path_windows.append(plot_win)
+
+            plot_win.show()
+
+        return show_path
+
+    def show_point_speeds(self, point: Point):
+        def show_speeds():
+            speed = point.speed
+            speed_x = [unit.x for unit in speed]
+            speed_y = [unit.y for unit in speed]
+            angle = point.analog_angle()
+
+            acceleration = point.acceleration
+            acc_x = [unit.x for unit in acceleration]
+            acc_y = [unit.y for unit in acceleration]
+            acc_angle = point.analog_angle()
+
+            win = pg.GraphicsLayoutWidget(show=True)
+            win.setWindowTitle('Аналоги скорости и ускорения точки %s' % point.name)
+
+            p1 = win.addPlot(title='Аналоги скорости')
+            p1.plot(speed_x, angle, name='Vx')
+            p1.plot(speed_y, angle, name='Vy')
+
+            p2 = win.addPlot(title='Аналоги ускорения')
+            p2.plot(acc_x, angle, name='ax')
+            p2.plot(acc_y, angle, name='ay')
+
+            self.plot_speed_windows.append(win)
+
+            win.show()
+
+        return show_speeds
+
+    def add_link_activities(self, link: Link, activity_func, containing_widget: QWidget):
         name_text = 'Звено %d' % link.provided_number
         if link.is_initial:
             name_text += '(Начальное):'
@@ -263,37 +335,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             hbox = QHBoxLayout()
             link_widget_vbox.addLayout(hbox)
             show_button = QPushButton('Показать')
-            show_button.clicked.connect(self.show_point_path(point))
+            show_button.clicked.connect(activity_func(point))
             hbox.addWidget(QLabel('Точка %s' % point.name))
             hbox.addWidget(show_button)
-        self.verticalLayout_11.addWidget(link_widget)
+        containing_widget.addWidget(link_widget)
         link_widget.adjustSize()
-
-    def set_trajectories_page(self):
-        self.researchPathsButton.hide()
-        self.add_link_paths(self.mechanism.initial_link)
-        self.next_button_5.show()
-
-        for link in self.mechanism.links:
-            self.add_link_paths(link)
-
-    def show_point_path(self, point: Point):
-        def show_path():
-            path = point.path.dots
-            remove_jumps(path)
-
-            plot_win = PathWindow()
-            plot_widget = pg.GraphicsLayoutWidget(show=True)
-            pg.setConfigOptions(antialias=True)
-
-            plot_widget.addPlot(title='Point A path', x=[dot.x for dot in path], y=[dot.y for dot in path])
-            plot_win.verticalLayout.addWidget(plot_widget)
-
-            self.plot_path_windows.append(plot_win)
-
-            plot_win.show()
-
-        return show_path
 
 
 class WindowMaker(object):

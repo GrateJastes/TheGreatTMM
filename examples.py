@@ -11,7 +11,7 @@ from src.common_entities import Dot
 from src.common_entities.mechanism.Mechanism import Mechanism
 from src.cv_module import consts
 from src.cv_module.cv_utils import remove_jumps
-from src.windows.PathWindow import PathWindow
+from src.windows.PathWindow import PlotWindow
 
 
 def examples():
@@ -43,5 +43,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-    # examples()
+    # main()
+    examples()

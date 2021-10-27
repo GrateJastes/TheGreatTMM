@@ -1,5 +1,10 @@
+import math
+
+import numpy as np
+
 from .Path import Path
-from ..diff import diff_utils
+from src.diff import diff_utils
+from src.diff import consts as diff_consts
 
 
 class Point:
@@ -13,3 +18,6 @@ class Point:
     def point_analysis(self, base):
         self.speed = diff_utils.diff1(self, base)
         self.acceleration = diff_utils.diff2(self, base)
+
+    def analog_angle(self):
+        return [i * diff_consts.STEP_SPLITTING for i in range(27)]

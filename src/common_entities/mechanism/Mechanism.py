@@ -113,6 +113,14 @@ class Mechanism:
         if progress_bar is not None:
             progress_bar.setValue(consts.PROGRESS_BAR_MAX)
 
+    def research_analogs(self):
+        initial_point = self.initial_link.points[0]
+        initial_point.point_analysis(initial_point)
+
+        for link in self.links:
+            for point in link.points:
+                point.point_analysis(initial_point)
+
     @staticmethod
     def video_fits(filename: str) -> bool:
         video = cv2.VideoCapture(filename)
