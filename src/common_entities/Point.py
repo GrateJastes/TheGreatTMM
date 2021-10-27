@@ -1,5 +1,7 @@
 import math
 
+import numpy as np
+
 from .Path import Path
 from src.diff import diff_utils
 from src.diff import consts as diff_consts
@@ -18,4 +20,4 @@ class Point:
         self.acceleration = diff_utils.diff2(self, base)
 
     def analog_angle(self):
-        return [i * diff_consts.STEP_SPLITTING for i in range(2 * math.pi / diff_consts.STEP_SPLITTING)]
+        return [i * diff_consts.STEP_SPLITTING for i in range(27)]

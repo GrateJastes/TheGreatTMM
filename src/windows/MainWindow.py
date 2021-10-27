@@ -31,6 +31,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.setWindowTitle('The Great TMM')
         self.form_links = []
         self.link_colors = []
         self.link_names = []
