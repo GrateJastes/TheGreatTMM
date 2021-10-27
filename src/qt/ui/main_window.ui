@@ -57,7 +57,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="WelcomePage">
        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
@@ -463,8 +463,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>810</width>
-             <height>955</height>
+             <width>724</width>
+             <height>901</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -559,10 +559,7 @@
                 </property>
                 <property name="text">
                  <string>Для каждого звена выберите свой цвет маркера, 
-введите данные о цвете и количестве точек на звеньях ниже.
- 
-Обратите внимание! 
-Начальное звено всегда помечается красным цветом!</string>
+введите данные о цвете и количестве точек на звеньях ниже.  Определите начальное звено</string>
                 </property>
                </widget>
               </item>
@@ -700,6 +697,15 @@
                          <width>50</width>
                          <height>16777215</height>
                         </size>
+                       </property>
+                       <property name="minimum">
+                        <number>1</number>
+                       </property>
+                       <property name="maximum">
+                        <number>3</number>
+                       </property>
+                       <property name="value">
+                        <number>1</number>
                        </property>
                       </widget>
                      </item>
@@ -887,6 +893,12 @@
                          <height>16777215</height>
                         </size>
                        </property>
+                       <property name="minimum">
+                        <number>1</number>
+                       </property>
+                       <property name="maximum">
+                        <number>3</number>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -1072,6 +1084,12 @@
                          <width>50</width>
                          <height>16777215</height>
                         </size>
+                       </property>
+                       <property name="minimum">
+                        <number>1</number>
+                       </property>
+                       <property name="maximum">
+                        <number>3</number>
                        </property>
                       </widget>
                      </item>
@@ -1259,6 +1277,12 @@
                          <height>16777215</height>
                         </size>
                        </property>
+                       <property name="minimum">
+                        <number>1</number>
+                       </property>
+                       <property name="maximum">
+                        <number>3</number>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -1445,6 +1469,12 @@
                          <height>16777215</height>
                         </size>
                        </property>
+                       <property name="minimum">
+                        <number>1</number>
+                       </property>
+                       <property name="maximum">
+                        <number>3</number>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -1630,6 +1660,12 @@
                          <width>50</width>
                          <height>16777215</height>
                         </size>
+                       </property>
+                       <property name="minimum">
+                        <number>1</number>
+                       </property>
+                       <property name="maximum">
+                        <number>3</number>
                        </property>
                       </widget>
                      </item>
@@ -1827,6 +1863,10 @@
             <italic>false</italic>
            </font>
           </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(228, 237, 255);
+</string>
+          </property>
           <property name="text">
            <string>Нажмите для проведения расчета</string>
           </property>
@@ -1868,9 +1908,284 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="trajectoryButton">
+         <widget class="QProgressBar" name="progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+          <property name="invertedAppearance">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="readyLabel">
+          <property name="font">
+           <font>
+            <pointsize>18</pointsize>
+            <italic>false</italic>
+           </font>
+          </property>
           <property name="text">
-           <string>Show trajectory</string>
+           <string>Готово!</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QPushButton" name="back_button_4">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Ubuntu</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(202, 214, 255);</string>
+            </property>
+            <property name="text">
+             <string>Назад</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="next_button_4">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Ubuntu</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(202, 214, 255);</string>
+            </property>
+            <property name="text">
+             <string>Далее</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="TrajectoryPage">
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+            <italic>false</italic>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(228, 237, 255);
+</string>
+          </property>
+          <property name="text">
+           <string>Проверьте траектории точек</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_11"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="researchPathsButton">
+          <property name="text">
+           <string>Расчитать траектории</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QPushButton" name="back_button_5">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Ubuntu</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(202, 214, 255);</string>
+            </property>
+            <property name="text">
+             <string>Назад</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="next_button_5">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Ubuntu</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(202, 214, 255);</string>
+            </property>
+            <property name="text">
+             <string>Далее</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page">
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+            <italic>false</italic>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(228, 237, 255);
+</string>
+          </property>
+          <property name="text">
+           <string>Расчет аналогов скоростей</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_12"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="researchAnalogs">
+          <property name="text">
+           <string>Расчитать</string>
           </property>
          </widget>
         </item>
@@ -1888,33 +2203,79 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="back_button_4">
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>100</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Ubuntu</family>
-            <pointsize>12</pointsize>
-            <italic>true</italic>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(202, 214, 255);</string>
-          </property>
-          <property name="text">
-           <string>Назад</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QPushButton" name="back_button_6">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Ubuntu</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(202, 214, 255);</string>
+            </property>
+            <property name="text">
+             <string>Назад</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="next_button_6">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Ubuntu</family>
+              <pointsize>12</pointsize>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(202, 214, 255);</string>
+            </property>
+            <property name="text">
+             <string>Далее</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>

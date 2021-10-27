@@ -1,3 +1,4 @@
+from PyQt5.QtWidgets import QProgressBar
 from cv2 import cv2
 import cv2.aruco
 
@@ -11,10 +12,6 @@ from .Link import Link
 
 # noinspection PyTypeChecker
 class Mechanism:
-    pass
-    links = []
-    initial_link = Link
-
     def __init__(self, path_to_file, debug_mode=consts.DebugMode.DEBUG_OFF):
         self.debug_mode = debug_mode
         if debug_mode != consts.DebugMode.DEBUG_OFF:
@@ -25,13 +22,15 @@ class Mechanism:
         self.aruco_parameters = cv2.aruco.DetectorParameters_create()
 
         self.video = cv2.VideoCapture(path_to_file)
+        self.initial_link = None
+        self.links = []
 
     def __del__(self):
         self.video.release()
 
     # Add link to the Mechanism. Can be used before research, on the configuring stage.
-    def set_new_link(self, link_color, points, is_initial):
-        link = Link(link_color, points, is_initial)
+    def set_new_link(self, link_color, points, is_initial, number=0):
+        link = Link(link_color, points, is_initial, number)
         if is_initial:
             self.initial_link = link
         else:
@@ -39,7 +38,11 @@ class Mechanism:
 
     # Researches provided video input after mechanism is configured and ready to go. This method returns nothing,
     # but it affects on Mechanism's inner instances and makes it real to work with Link's data arrays
-    def research_input(self):
+    def research_input(self, progress_bar: QProgressBar = None):
+        total_frames = self.video.get(cv2.CAP_PROP_FRAME_COUNT)
+        frame_per_percent = int(total_frames / consts.PROGRESS_BAR_MAX)
+        i = 0
+
         # Some debugging-purpose vars.
         missed_in_a_row = 0
         max_missed = 0
@@ -96,12 +99,19 @@ class Mechanism:
                 if ch == consts.ESC_KEY_CODE:
                     break
 
+            i += 1
+            if i % frame_per_percent == 0 and progress_bar is not None:
+                progress_bar.setValue(i)
+
         # Debugging info again.
         if self.debug_mode != consts.DebugMode.DEBUG_OFF:
             print('frames: ', frames_num)
             print('final dots: ', len(self.initial_link.points[0].path.dots))
             print('total missed: ', missed_total)
             print('missed by aruco: ', missed_by_aruco)
+
+        if progress_bar is not None:
+            progress_bar.setValue(consts.PROGRESS_BAR_MAX)
 
     @staticmethod
     def video_fits(filename: str) -> bool:

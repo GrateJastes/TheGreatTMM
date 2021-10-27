@@ -13,7 +13,10 @@ __all__ = ['minimize',
            'traverse_coordinates',
            'find_omega',
            'find_closest',
+           'remove_jumps',
            ]
+
+from ...common_entities import Dot
 
 
 def minimize(img, scale):
@@ -89,3 +92,11 @@ def find_closest(last_dot, candidates):
             result = candidate
 
     return result
+
+
+def remove_jumps(path: list[Dot]):
+    for idx, dot in enumerate(path):
+        if idx == 0:
+            continue
+        if math.sqrt((dot.x - path[idx - 1].x) ** 2 + (dot.y - path[idx - 1].y) ** 2) > 10:
+            path.remove(dot)

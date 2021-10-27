@@ -12,10 +12,11 @@ class Link:
     is_initial = bool
     points = [common_entities.Point]
 
-    def __init__(self, color, points, is_initial=False):
+    def __init__(self, color, points, is_initial=False, provided_number=0):
         self.color = color
         self.points = points
         self.is_initial = is_initial
+        self.provided_number = provided_number
 
         self.color_bounds = consts.get_bound_colors(color)
 
