@@ -4,3 +4,5 @@
 assets
 **/__pycache__
 venv
+/src/qt/gen/
+examples.py

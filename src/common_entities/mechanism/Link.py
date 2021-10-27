@@ -1,8 +1,8 @@
 from cv2 import cv2
 
-from src import common
+from src import common_entities
 from src.cv_module import consts
-from src.cv_module.cv_utils import prepare_frame, find_marker_signatures, traverse_coordinates, find_omega, find_closest
+from src.cv_module.cv_utils.utils import *
 from src.cv_module.cv_utils.geometry import ellipse_area
 
 
@@ -10,12 +10,13 @@ from src.cv_module.cv_utils.geometry import ellipse_area
 # state when the needed data is provided.
 class Link:
     is_initial = bool
-    points = [common.Point]
+    points = [common_entities.Point]
 
-    def __init__(self, color, points, is_initial=False):
+    def __init__(self, color, points, is_initial=False, provided_number=0):
         self.color = color
         self.points = points
         self.is_initial = is_initial
+        self.provided_number = provided_number
 
         self.color_bounds = consts.get_bound_colors(color)
 

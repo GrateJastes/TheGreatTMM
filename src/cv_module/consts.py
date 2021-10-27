@@ -60,3 +60,6 @@ def get_bound_colors(color):
         BGR.RED: (HSV.LOWER_RED, HSV.UPPER_RED),
         BGR.BLUE: (HSV.LOWER_BLUE, HSV.UPPER_BLUE),
     }.get(color)
+
+
+PROGRESS_BAR_MAX = 100
