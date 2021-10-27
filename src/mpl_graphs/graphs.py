@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import InterpolatedUnivariateSpline
 
-from src.diff import diff_utils
+from src.diff import diff_utils, consts
 
 
 def print_path(*points):
@@ -24,16 +24,16 @@ def spline_analog(omegai, yi):
     return s(omega)
 
 
-def print_analog_v(step, *points):
+def print_analog_v(*points):
     # omega = np.linspace(0, 2 * math.pi, 100)
     plt.subplot(211)
     plt.title('Цикловые графики аналогов скоростей')
     for point in points:
-        f = diff_utils.polinom([item * step for item in range(len(point.speed))],
+        f = diff_utils.polinom([item * consts.STEP_SPLITTING for item in range(len(point.speed))],
                                [unit.x for unit in point.speed])
-        plt.plot([item * step for item in range(len(point.speed))],
-                 [f(om) for om in [item * step for item in range(len(point.speed))]], label=point.name)
-        # plt.plot(omega, spline_analog([item * step for item in range(len(point.speed))],
+        plt.plot([item * consts.STEP_SPLITTING for item in range(len(point.speed))],
+                 [f(om) for om in [item * consts.STEP_SPLITTING for item in range(len(point.speed))]], label=point.name)
+        # plt.plot(omega, spline_analog([item * consts.STEP_SPLITTING for item in range(len(point.speed))],
         #                               [unit.x for unit in point.speed]))
     plt.ylabel("v_x")
     plt.grid(True)
@@ -41,11 +41,11 @@ def print_analog_v(step, *points):
 
     plt.subplot(212)
     for point in points:
-        f = diff_utils.polinom([item * step for item in range(len(point.speed))],
+        f = diff_utils.polinom([item * consts.STEP_SPLITTING for item in range(len(point.speed))],
                                [unit.y for unit in point.speed])
-        plt.plot([item * step for item in range(len(point.speed))],
-                 [f(om) for om in [item * step for item in range(len(point.speed))]], label=point.name)
-        # plt.plot(omega, spline_analog([item * step for item in range(len(point.speed))],
+        plt.plot([item * consts.STEP_SPLITTING for item in range(len(point.speed))],
+                 [f(om) for om in [item * consts.STEP_SPLITTING for item in range(len(point.speed))]], label=point.name)
+        # plt.plot(omega, spline_analog([item * consts.STEP_SPLITTING for item in range(len(point.speed))],
         #                               [unit.y for unit in point.speed]))
     plt.xlabel("phi")
     plt.ylabel("v_y")
@@ -55,16 +55,17 @@ def print_analog_v(step, *points):
     plt.show()
 
 
-def print_analog_a(step, *points):
+def print_analog_a(*points):
     # omega = np.linspace(0, 2 * math.pi, 100)
     plt.subplot(211)
     plt.title('Цикловые графики аналогов ускорений')
     for point in points:
-        f = diff_utils.polinom([item * step for item in range(len(point.acceleration))],
+        f = diff_utils.polinom([item * consts.STEP_SPLITTING for item in range(len(point.acceleration))],
                                [unit.x for unit in point.acceleration])
-        plt.plot([item * step for item in range(len(point.acceleration))],
-                 [f(om) for om in [item * step for item in range(len(point.acceleration))]], label=point.name)
-        # plt.plot(omega, spline_analog([item * step for item in range(len(point.acceleration))],
+        plt.plot([item * consts.STEP_SPLITTING for item in range(len(point.acceleration))],
+                 [f(om) for om in [item * consts.STEP_SPLITTING for item in range(len(point.acceleration))]],
+                 label=point.name)
+        # plt.plot(omega, spline_analog([item * consts.STEP_SPLITTING for item in range(len(point.acceleration))],
         #                               [unit.x for unit in point.acceleration]))
     plt.ylabel("a_x")
     plt.grid(True)
@@ -72,11 +73,12 @@ def print_analog_a(step, *points):
 
     plt.subplot(212)
     for point in points:
-        f = diff_utils.polinom([item * step for item in range(len(point.acceleration))],
+        f = diff_utils.polinom([item * consts.STEP_SPLITTING for item in range(len(point.acceleration))],
                                [unit.y for unit in point.acceleration])
-        plt.plot([item * step for item in range(len(point.acceleration))],
-                 [f(om) for om in [item * step for item in range(len(point.acceleration))]], label=point.name)
-        # plt.plot(omega, spline_analog([item * step for item in range(len(point.acceleration))],
+        plt.plot([item * consts.STEP_SPLITTING for item in range(len(point.acceleration))],
+                 [f(om) for om in [item * consts.STEP_SPLITTING for item in range(len(point.acceleration))]],
+                 label=point.name)
+        # plt.plot(omega, spline_analog([item * consts.STEP_SPLITTING for item in range(len(point.acceleration))],
         #                               [unit.y for unit in point.acceleration]))
     plt.xlabel("phi")
     plt.ylabel("a_y")
