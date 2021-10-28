@@ -11,7 +11,6 @@ from src.common_entities import Dot
 from src.common_entities.mechanism.Mechanism import Mechanism
 from src.cv_module import consts
 from src.cv_module.cv_utils import remove_jumps
-from src.windows.PathWindow import PlotWindow
 
 
 def examples():
