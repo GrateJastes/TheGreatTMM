@@ -277,10 +277,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             path = point.path.dots
             remove_jumps(path)
             plot_win = PlotWindow()
+            plot_win.setWindowTitle('Точка %s' % point.name)
             plot_widget = pg.GraphicsLayoutWidget(show=True)
             pg.setConfigOptions(antialias=True)
 
-            plot_widget.addPlot(title='Point A path', x=[dot.x for dot in path], y=[dot.y for dot in path])
+            plot_widget.addPlot(
+                title='Point %s path' % point.name,
+                x=[dot.x for dot in path],
+                y=[dot.y for dot in path]
+            )
             plot_win.verticalLayout.addWidget(plot_widget)
 
             self.plot_path_windows.append(plot_win)
@@ -299,18 +304,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             acceleration = point.acceleration
             acc_x = [unit.x for unit in acceleration]
             acc_y = [unit.y for unit in acceleration]
-            acc_angle = point.analog_angle()
 
             win = pg.GraphicsLayoutWidget(show=True)
             win.setWindowTitle('Аналоги скорости и ускорения точки %s' % point.name)
 
             p1 = win.addPlot(title='Аналоги скорости')
-            p1.plot(speed_x, angle, name='Vx')
-            p1.plot(speed_y, angle, name='Vy')
+            p1.plot(y=speed_x, x=angle, name='Vx', pen=consts.BGR.RED)
+            p1.plot(y=speed_y, x=angle, name='Vy', pen=consts.BGR.GREEN)
 
             p2 = win.addPlot(title='Аналоги ускорения')
-            p2.plot(acc_x, angle, name='ax')
-            p2.plot(acc_y, angle, name='ay')
+            p2.plot(y=acc_x, x=angle, name='ax', pen=consts.BGR.RED)
+            p2.plot(y=acc_y, x=angle, name='ay', pen=consts.BGR.GREEN)
 
             self.plot_speed_windows.append(win)
 
