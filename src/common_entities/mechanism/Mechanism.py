@@ -72,7 +72,7 @@ class Mechanism:
 
             i += 1
             if i % (frame_per_percent + 1) == 0 and progress_bar is not None:
-                progress_bar.setValue(i)
+                progress_bar.setValue(i / frame_per_percent)
 
     def first_circle_dots(self) -> list[Dot]:
         movement_started = False
