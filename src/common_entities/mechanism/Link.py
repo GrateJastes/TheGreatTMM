@@ -12,15 +12,15 @@ class Link:
     is_initial = bool
     points = [common_entities.Point]
 
-    def __init__(self, color, points, is_initial=False, provided_number=0):
+    def __init__(self, color, points, is_initial=False, link_id=0):
         self.color = color
         self.points = points
         self.is_initial = is_initial
-        self.provided_number = provided_number
+        self.link_id = link_id
 
         self.color_bounds = consts.get_bound_colors(color)
 
-    def research_link(self, start_frame, origin, omega=None):
+    def research_link(self, start_frame) -> bool:
         research_ok = True
 
         # First of all we preparing frame and converting it to binary image. It is made to research the current link's
@@ -30,14 +30,14 @@ class Link:
         contours, _ = cv2.findContours(frame, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         if not contours:
             research_ok = False
-            return research_ok, None
+            return research_ok
 
         # Finding all signatures on the frame, which can be interpreted as link's points' markers. And representing
         # them as ellipses fitted to the contours
         signatures = find_marker_signatures(contours)
         if not signatures:
             research_ok = False
-            return research_ok, None
+            return research_ok
 
         # Sorting found signatures by their area to discard small round-shaped interferences
         signatures.sort(key=ellipse_area, reverse=True)
@@ -46,16 +46,14 @@ class Link:
         # must calculate omega angle in this case.
         if self.is_initial:
             # Traversing coordinates, assuming origin marker as origin
-            marker = traverse_coordinates((int(signatures[0][0][0]), int(signatures[0][0][1])), origin)
-            # Calculating omega in the state
-            found_omega = find_omega(marker)
+            marker = (int(signatures[0][0][0]), int(signatures[0][0][1]))
             # Adding current point to the Link's path
-            self.points[0].path.append(marker, found_omega)
-            return research_ok, found_omega
+            self.points[0].path.append(marker)
+            return research_ok
 
-        # If the link is not initial, it can contain few PoI. In this case we must research all of the signatures,
+        # If the link is not initial, it can contain several PoI. In this case we must research all of the signatures,
         # to find relevant(s). Here we make markers (x and y list-pairs) from the signatures' ellipses
-        markers = [traverse_coordinates((int(ellipse[0][0]), int(ellipse[0][1])), origin) for ellipse in signatures]
+        markers = [(int(ellipse[0][0]), int(ellipse[0][1])) for ellipse in signatures]
 
         # Making list of the last dots to every PoI.
         last_dots = [point.path.last_dot for point in self.points]
@@ -73,7 +71,7 @@ class Link:
             if point.path.last_dot is None:
                 research_ok = False
                 try:
-                    point.path.append(next(rest_markers_iter), omega)
+                    point.path.append(next(rest_markers_iter))
                     research_ok = True
                 # If there is some PoI which isn't matched to any marker yet, but markers are already out, we
                 # must exit the cycle and drop the current frame's research for this Link.
@@ -82,10 +80,10 @@ class Link:
 
             # But if we have found the next dot to the point's path, we could append it and proceed further
             if point.path.last_dot in matches.keys():
-                point.path.append(matches[point.path.last_dot], omega)
+                point.path.append(matches[point.path.last_dot])
                 research_ok = True
 
-        return research_ok, None
+        return research_ok
 
     # Private method for local usage. Returns found matches (dict. markers to dots) and the rejected markers
     def __find_matches(self, last_dots, markers):
@@ -121,3 +119,7 @@ class Link:
 
         # After all we return the confirmed matches and the markers which don't have any close 'last dots' to them
         return final_matches, markers
+
+    def miss_frame(self):
+        for point in self.points:
+            point.path.append((None, None))

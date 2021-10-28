@@ -3,7 +3,7 @@ import math
 from cv2 import cv2
 
 from .. import consts
-from .geometry import bad_circle, bad_ellipse_fitting, ellipse_area
+from .geometry import bad_circle, bad_ellipse_fitting
 
 __all__ = ['minimize',
            'show',
@@ -14,6 +14,7 @@ __all__ = ['minimize',
            'find_omega',
            'find_closest',
            'remove_jumps',
+           'distance',
            ]
 
 from ...common_entities import Dot
@@ -100,3 +101,11 @@ def remove_jumps(path: list[Dot]):
             continue
         if math.sqrt((dot.x - path[idx - 1].x) ** 2 + (dot.y - path[idx - 1].y) ** 2) > 10:
             path.remove(dot)
+
+
+def distance(dot1: Dot, dot2: Dot) -> float:
+    return math.sqrt((dot1.x - dot2.x) ** 2 + (dot1.y - dot2.y) ** 2)
+
+
+def is_near(dot1: Dot, dot2: Dot) -> bool:
+    return distance(dot1, dot2) < consts.MIN_CLOSURE_DIST

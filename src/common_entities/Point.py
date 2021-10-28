@@ -1,14 +1,10 @@
-import math
-
-import numpy as np
-
 from .Path import Path
 from src.diff import diff_utils
 from src.diff import consts as diff_consts
 
 
 class Point:
-    def __init__(self, name, is_base=False):
+    def __init__(self, name: str, is_base=False):
         self.is_base = is_base
         self.name = name
         self.path = Path()

@@ -1,16 +1,11 @@
-import math
 import os
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QApplication, QMessageBox, QWidget, QVBoxLayout, QLabel, QHBoxLayout, \
     QPushButton
-from matplotlib import pyplot as plt
 
-import src
 from src.common_entities import Point
 from src.common_entities.mechanism.Link import Link
 from src.cv_module import consts
-from src.cv_module.cv_utils import remove_jumps
-from src.diff import consts as diff_consts
 from src.qt.QHline import QHLine
 from src.qt.gen.ApplicationUI import Ui_MainWindow
 from src.common_entities.mechanism.Mechanism import Mechanism
@@ -191,7 +186,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             name = link_names[i]
             point_names = ['%s%d' % (name, index) for index in range(links_amount_points[i])]
             points = [Point(point_name, links_initial[i]) for point_name in point_names]
-            links.append(Link(link_colors[i], points, links_initial[i], provided_number=i + 1))
+            links.append(Link(link_colors[i], points, links_initial[i], link_id=i + 1))
 
         return links
 
@@ -199,7 +194,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mechanism = Mechanism(self.videoFilePath.text())
         links = self.collect_links_data()
         for link in links:
-            self.mechanism.set_new_link(link.color, link.points, link.is_initial, link.provided_number)
+            self.mechanism.set_new_link(link.color, link.points, link.is_initial, link.link_id)
 
         self.mechanism.research_input(self.progressBar)
 
@@ -275,7 +270,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def show_point_path(self, point: Point):
         def show_path():
             path = point.path.dots
-            remove_jumps(path)
             plot_win = PlotWindow()
             plot_win.setWindowTitle('Точка %s' % point.name)
             plot_widget = pg.GraphicsLayoutWidget(show=True)
@@ -323,7 +317,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         return show_speeds
 
     def add_link_activities(self, link: Link, activity_func, containing_widget: QWidget):
-        name_text = 'Звено %d' % link.provided_number
+        name_text = 'Звено %d' % link.link_id
         if link.is_initial:
             name_text += '(Начальное):'
         else:

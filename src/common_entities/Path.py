@@ -11,6 +11,6 @@ class Path:
         self.missed_dots = 0
         self.last_dot = None
 
-    def append(self, coords, omega):
+    def append(self, coords: tuple):
         self.last_dot = coords
-        self.dots.append(AnalogDot((coords[0], coords[1]), omega))
+        self.dots.append(AnalogDot((coords[0], coords[1]), None))
