@@ -20,4 +20,4 @@ class Point:
         self.acceleration = diff_utils.diff2(self, base)
 
     def analog_angle(self):
-        return [i * diff_consts.STEP_SPLITTING for i in range(27)]
+        return [i * diff_consts.STEP_SPLITTING for i in range(len(self.speed))]
