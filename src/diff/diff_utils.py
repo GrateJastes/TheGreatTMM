@@ -1,5 +1,6 @@
 import math
 
+import findiff
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -123,3 +124,17 @@ def data_fit(data_list):
     for i in range(len(data_list)):
         data_list_pol.append(Unit(fx(i * consts.STEP_SPLITTING), fy(i * consts.STEP_SPLITTING)))
     return data_list_pol
+
+
+def diff2_fd(point, base):
+    ip_dot_list = interpolate(point, base)
+    a_list = []
+    d_do = findiff.FinDiff(0, consts.STEP_SPLITTING, 2, acc=4)
+    x_array = np.array([dot.x for dot in ip_dot_list.path.dots])
+    y_array = np.array([dot.y for dot in ip_dot_list.path.dots])
+    dx_do = d_do(x_array)
+    dy_do = d_do(y_array)
+    for i in range(len(dx_do)):
+        a_list.append(Unit(dx_do[i], dy_do[i]))
+    a_list_pol = data_fit(a_list)
+    return a_list_pol
