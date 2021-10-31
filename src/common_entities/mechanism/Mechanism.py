@@ -7,7 +7,7 @@ from .Link import Link
 
 # noinspection PyTypeChecker
 from .. import Dot
-from ...cv_module.cv_utils import distance
+from ...cv_module.cv_utils import distance, minimize
 
 
 class Mechanism:
@@ -16,6 +16,9 @@ class Mechanism:
         self.initial_link = None
         self.links = []
         self.origin = None
+        self.demonstration_frame = None
+        self.demonstration_frame_num = None
+        self.preview_image = None
 
     def __del__(self):
         self.video.release()
@@ -50,9 +53,12 @@ class Mechanism:
     def process_video_input(self, progress_bar: QProgressBar = None):
         total_frames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
         frame_per_percent = int(total_frames / consts.PROGRESS_BAR_MAX)
-        i = 0
+        frame_num = 0
 
+        demonstration_frame_ready = False
         while True:
+            frame_is_full = True
+
             frame_read, start_frame = self.video.read()
             if not frame_read:
                 break
@@ -62,17 +68,25 @@ class Mechanism:
             initial_ok = self.initial_link.research_link(start_frame)
             if not initial_ok:
                 self.initial_link.miss_frame()
-                print(i)
+                frame_is_full = False
 
             # Then we are researching the other links one by one
             for link in self.links:
                 link_ok = link.research_link(start_frame)
                 if not link_ok:
                     link.miss_frame()
+                    frame_is_full = False
 
-            i += 1
-            if i % (frame_per_percent + 1) == 0 and progress_bar is not None:
-                progress_bar.setValue(i / frame_per_percent)
+            if not demonstration_frame_ready and frame_is_full:
+                self.demonstration_frame = start_frame
+                self.demonstration_frame_num = frame_num
+                frame_is_full = True
+
+            frame_num += 1
+            if frame_num % (frame_per_percent + 1) == 0 and progress_bar is not None:
+                progress_bar.setValue(frame_num / frame_per_percent)
+
+        self.preview_image = self.get_preview_image()
 
     def first_circle_dots(self) -> list[Dot]:
         movement_started = False
@@ -159,6 +173,15 @@ class Mechanism:
             for point in link.points:
                 for i, dot in enumerate(point.path.dots):
                     dot.omega = self.initial_link.points[0].path.dots[i].omega
+
+    def get_preview_image(self):
+        self.demonstration_frame = minimize(self.demonstration_frame, consts.PREVIEW_MINIMIZATION_SCALE)
+        self.initial_link.draw_on_frame(self.demonstration_frame, self.demonstration_frame_num)
+
+        for link in self.links:
+            link.draw_on_frame(self.demonstration_frame, self.demonstration_frame_num)
+
+        return self.demonstration_frame
 
     @staticmethod
     def video_fits(filename: str) -> bool:

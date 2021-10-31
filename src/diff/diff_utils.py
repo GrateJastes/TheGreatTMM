@@ -1,6 +1,7 @@
 import math
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 from src import common_entities
 from src.common_entities.Unit import Unit
@@ -59,7 +60,8 @@ def diff1(point, base):
         v_list.append(Unit(central_difference_1(ip_dot_list, i, 'x'),
                            central_difference_1(ip_dot_list, i, 'y')))
     v_list.append(Unit(backward_difference_1(ip_dot_list, 'x'), backward_difference_1(ip_dot_list, 'y')))
-    return v_list
+    v_list_pol = data_fit(v_list)
+    return v_list_pol
 
 
 def forward_difference_2(ip_point, type_of_coord):
@@ -101,7 +103,8 @@ def diff2(point, base):
     for num in range(1, len(ip_dot_list.path.dots) - 1):
         a_list.append(Unit(central_difference_2(ip_dot_list, num, 'x'), central_difference_2(ip_dot_list, num, 'y')))
     a_list.append(Unit(backward_difference_2(ip_dot_list, 'x'), backward_difference_2(ip_dot_list, 'y')))
-    return a_list
+    a_list_pol = data_fit(a_list)
+    return a_list_pol
 
 
 # Returns a polynomial function of dependence of y on x
@@ -109,3 +112,14 @@ def polinom(x, y):
     z = np.polyfit(x, y, consts.DEGREE_OF_POLYNOMIAL)
     p = np.poly1d(z)
     return p
+
+
+def data_fit(data_list):
+    fx = polinom([item * consts.STEP_SPLITTING for item in range(len(data_list))],
+                 [unit.x for unit in data_list])
+    fy = polinom([item * consts.STEP_SPLITTING for item in range(len(data_list))],
+                 [unit.y for unit in data_list])
+    data_list_pol = []
+    for i in range(len(data_list)):
+        data_list_pol.append(Unit(fx(i * consts.STEP_SPLITTING), fy(i * consts.STEP_SPLITTING)))
+    return data_list_pol
