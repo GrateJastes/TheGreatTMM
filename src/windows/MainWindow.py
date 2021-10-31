@@ -10,6 +10,7 @@ from src.qt.QHline import QHLine
 from src.qt.gen.ApplicationUI import Ui_MainWindow
 from src.common_entities.mechanism.Mechanism import Mechanism
 from src.cv_module.consts import BGR
+from src.windows.DisplayImageWidget import DisplayImageWidget
 from src.windows.PlotWindow import PlotWindow
 import pyqtgraph as pg
 
@@ -35,6 +36,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.plot_path_windows = []
         self.plot_speed_windows = []
         self.mechanism = None
+        self.preview_window = None
 
         self.researchPathsButton.clicked.connect(self.set_trajectories_page)
         self.researchAnalogs.clicked.connect(self.set_speeds_page)
@@ -134,6 +136,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.readyLabel.hide()
         self.next_button_4.hide()
+        self.next_button_4.clicked.connect(self.show_preview_window)
 
         self.progressBar.valueChanged.connect(self.show_ready_label)
 
@@ -197,6 +200,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.mechanism.set_new_link(link.color, link.points, link.is_initial, link.link_id)
 
         self.mechanism.research_input(self.progressBar)
+
+    def show_preview_window(self):
+        self.preview_window = DisplayImageWidget()
+        self.preview_window.show_image(self.mechanism.preview_image)
+        self.preview_window.show()
 
     def show_ready_label(self):
         if self.progressBar.value() == consts.PROGRESS_BAR_MAX:

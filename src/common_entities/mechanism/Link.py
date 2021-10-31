@@ -123,3 +123,32 @@ class Link:
     def miss_frame(self):
         for point in self.points:
             point.path.append((None, None))
+
+    def draw_on_frame(self, frame, frame_num):
+        for point in self.points:
+            point_coords = (
+                point.path.dots[frame_num].x,
+                point.path.dots[frame_num].y,
+            )
+            text_coords = (
+                point.path.dots[frame_num].x + consts.PREVIEW_POINT_TEXT_SHIFT,
+                point.path.dots[frame_num].y - consts.PREVIEW_POINT_TEXT_SHIFT,
+            )
+
+            cv2.circle(
+                frame,
+                point_coords,
+                consts.PREVIEW_POINT_CENTRE_RADIUS,
+                consts.BGR.YELLOW,
+                consts.PREVIEW_POINT_CENTRE_THICKNESS,
+            )
+
+            cv2.putText(
+                frame,
+                point.name,
+                text_coords,
+                cv2.FONT_HERSHEY_SIMPLEX,
+                consts.PREVIEW_POINT_FONT_SCALE,
+                consts.BGR.YELLOW,
+                consts.PREVIEW_POINT_TEXT_THICKNESS,
+            )
