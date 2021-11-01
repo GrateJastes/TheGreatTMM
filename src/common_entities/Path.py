@@ -12,5 +12,6 @@ class Path:
         self.last_dot = None
 
     def append(self, coords: tuple):
-        self.last_dot = coords
+        if coords[0] is not None:
+            self.last_dot = coords
         self.dots.append(AnalogDot((coords[0], coords[1]), None))

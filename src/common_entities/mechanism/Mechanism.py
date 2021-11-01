@@ -1,3 +1,4 @@
+import numpy as np
 from PyQt5.QtWidgets import QProgressBar
 from cv2 import cv2
 import cv2.aruco
@@ -7,7 +8,7 @@ from .Link import Link
 
 # noinspection PyTypeChecker
 from .. import Dot
-from ...cv_module.cv_utils import distance, minimize
+from ...cv_module.cv_utils import distance, minimize, remove_jumps
 
 
 class Mechanism:
@@ -19,6 +20,9 @@ class Mechanism:
         self.demonstration_frame = None
         self.demonstration_frame_num = None
         self.preview_image = None
+        self.hsv_settings_window = None
+        self.hsv_preview_window = None
+        self.current_hsv_frame = None
 
     def __del__(self):
         self.video.release()
@@ -33,11 +37,27 @@ class Mechanism:
 
     # Researches provided video input after mechanism is configured and ready to go. This method returns nothing,
     # but it affects on Mechanism's inner instances and makes it real to work with Link's data arrays
-    def research_input(self, progress_bar: QProgressBar = None):
+    def research_input(
+            self,
+            progress_bar: QProgressBar = None,
+            hsv_settings_window=None,
+            hsv_preview_window=None,
+    ):
         self.process_video_input(progress_bar)
         self.find_origin(self.first_circle_dots())
         self.traverse_all_coordinates()
         self.find_all_omegas()
+        self.hsv_preview_window = hsv_preview_window
+        self.hsv_settings_window = hsv_settings_window
+
+        if consts.DEBUG:
+            self.start_hsv_settings()
+
+        # remove_jumps(self.initial_link.points[0].path.dots)
+
+        for link in self.links:
+            for point in link.points:
+                remove_jumps(point.path.dots)
 
         if progress_bar is not None:
             progress_bar.setValue(consts.PROGRESS_BAR_MAX)
@@ -181,6 +201,38 @@ class Mechanism:
             link.draw_on_frame(self.demonstration_frame, self.demonstration_frame_num)
 
         return minimize(self.demonstration_frame, consts.PREVIEW_MINIMIZATION_SCALE)
+
+    def update_hsv_settings(self, hsv):
+        trackers_info = self.hsv_settings_window.get_trackers_info()
+        lower = (trackers_info['h1'], trackers_info['s1'], trackers_info['v1'])
+        upper = (trackers_info['h2'], trackers_info['s2'], trackers_info['v2'])
+        h_min = np.array(lower, np.uint8)
+        h_max = np.array(upper, np.uint8)
+
+        thresh = cv2.inRange(hsv, h_min, h_max)
+
+        self.hsv_preview_window.show_image(thresh)
+
+    def setup_hsv_settings_frame(self, frame, color_bounds):
+        self.hsv_settings_window.set_trackers_values(color_bounds)
+        self.current_hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        self.update_hsv_settings(self.current_hsv_frame)
+
+    def get_frame(self, frame_num):
+        self.video.set(cv2.CAP_PROP_POS_FRAMES, frame_num - 1)
+        _, frame = self.video.read()
+
+        return frame
+
+    def start_hsv_settings(self):
+        link = self.links[0]
+
+        window_set_up = False
+        color_bounds = consts.get_bound_colors(link.color)
+        for idx, dot in enumerate(link.points[0].path.dots):
+            if not window_set_up and dot.x is None:
+                self.setup_hsv_settings_frame(self.get_frame(idx), color_bounds)
+                break
 
     @staticmethod
     def video_fits(filename: str) -> bool:

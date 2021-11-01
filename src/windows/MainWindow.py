@@ -11,6 +11,7 @@ from src.qt.gen.ApplicationUI import Ui_MainWindow
 from src.common_entities.mechanism.Mechanism import Mechanism
 from src.cv_module.consts import BGR
 from src.windows.DisplayImageWidget import DisplayImageWidget
+from src.windows.HSVSettingsWindow import HSVSettingsWindow
 from src.windows.PlotWindow import PlotWindow
 import pyqtgraph as pg
 
@@ -37,9 +38,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.plot_speed_windows = []
         self.mechanism = None
         self.preview_window = None
+        self.hsv_settings_window = None
+        self.hsv_preview_window = None
 
         self.researchPathsButton.clicked.connect(self.set_trajectories_page)
         self.researchAnalogs.clicked.connect(self.set_speeds_page)
+        if consts.DEBUG:
+            self.setup_hsv_settings()
+
+    def setup_hsv_settings(self):
+        self.hsv_preview_window = DisplayImageWidget()
+        self.hsv_preview_window.show()
+        self.hsv_settings_window = HSVSettingsWindow(self)
+        self.hsv_settings_window.show()
 
     def set_screen_geometry(self):
         screen_geometry = QApplication.desktop().screenGeometry()
@@ -199,7 +210,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for link in links:
             self.mechanism.set_new_link(link.color, link.points, link.is_initial, link.link_id)
 
-        self.mechanism.research_input(self.progressBar)
+        self.mechanism.research_input(self.progressBar, self.hsv_settings_window, self.hsv_preview_window)
 
     def show_preview_window(self):
         self.preview_window = DisplayImageWidget()
@@ -285,8 +296,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             plot_widget.addPlot(
                 title='Point %s path' % point.name,
-                x=[dot.x for dot in path],
-                y=[dot.y for dot in path]
+                x=[dot.x for dot in path if dot.x is not None],
+                y=[dot.y for dot in path if dot.x is not None]
             )
             plot_win.verticalLayout.addWidget(plot_widget)
 
@@ -323,6 +334,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             win.show()
 
         return show_speeds
+
+    def update_hsv(self):
+        self.mechanism.update_hsv_settings(self.mechanism.current_hsv_frame)
 
     def add_link_activities(self, link: Link, activity_func, containing_widget: QWidget):
         name_text = 'Звено %d' % link.link_id

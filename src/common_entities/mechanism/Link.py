@@ -54,6 +54,8 @@ class Link:
         # If the link is not initial, it can contain several PoI. In this case we must research all of the signatures,
         # to find relevant(s). Here we make markers (x and y list-pairs) from the signatures' ellipses
         markers = [(int(ellipse[0][0]), int(ellipse[0][1])) for ellipse in signatures]
+        if markers is None or markers[0] is None:
+            return False
 
         # Making list of the last dots to every PoI.
         last_dots = [point.path.last_dot for point in self.points]
@@ -97,7 +99,7 @@ class Link:
 
         # First of all we are looking for markers which are closest to every dot on the ends of the paths
         for last_dot in last_dots:
-            if last_dot is None:
+            if last_dot is None or last_dot[0] is None:
                 continue
 
             closest_marker = find_closest(last_dot, markers)

@@ -17,7 +17,7 @@ __all__ = ['minimize',
            'distance',
            ]
 
-from ...common_entities import Dot
+from ...common_entities import Dot, AnalogDot
 
 
 def minimize(img, scale):
@@ -97,10 +97,10 @@ def find_closest(last_dot, candidates):
 
 def remove_jumps(path: list[Dot]):
     for idx, dot in enumerate(path):
-        if idx == 0:
+        if idx == 0 or dot.x is None or path[idx - 1].x is None:
             continue
-        if math.sqrt((dot.x - path[idx - 1].x) ** 2 + (dot.y - path[idx - 1].y) ** 2) > 10:
-            path.remove(dot)
+        if distance(dot, path[idx - 1]) > 10:
+            path[idx] = AnalogDot((None, None), None)
 
 
 def distance(dot1: Dot, dot2: Dot) -> float:

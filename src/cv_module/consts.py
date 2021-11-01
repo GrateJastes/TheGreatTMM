@@ -1,5 +1,7 @@
 import numpy as np
 
+DEBUG = False
+
 # Here is file with most of constant values we will be using in the entire project. They can be divided into classes
 # or dictionaries to keep this file more structured
 
@@ -9,7 +11,8 @@ import numpy as np
 class HSV:
     LOWER_RED = np.array([0, 150, 133])
     UPPER_RED = np.array([255, 255, 255])
-    LOWER_BLUE = np.array([109, 11, 68])
+    # LOWER_BLUE = np.array([109, 11, 68])
+    LOWER_BLUE = np.array([87, 150, 40])
     UPPER_BLUE = np.array([149, 255, 255])
 
 
@@ -64,7 +67,7 @@ def get_bound_colors(color):
 
 PROGRESS_BAR_MAX = 100
 
-MIN_CLOSURE_DIST = 10.0
+MIN_CLOSURE_DIST = 12.0
 MIN_DIST_TO_START = MIN_CLOSURE_DIST * 1.5
 DOTS_AFTER_CIRCLE = 1
 
