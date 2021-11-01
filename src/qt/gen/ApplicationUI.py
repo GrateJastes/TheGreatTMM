@@ -1009,7 +1009,7 @@ class Ui_MainWindow(object):
         self.researchPathsButton.setText(_translate("MainWindow", "Расчитать траектории"))
         self.back_button_5.setText(_translate("MainWindow", "Назад"))
         self.next_button_5.setText(_translate("MainWindow", "Далее"))
-        self.label_5.setText(_translate("MainWindow", "Расчет аналогов скоростей"))
+        self.label_5.setText(_translate("MainWindow", "Расчет аналогов скоростей и ускорений"))
         self.researchAnalogs.setText(_translate("MainWindow", "Расчитать"))
         self.back_button_6.setText(_translate("MainWindow", "Назад"))
         self.next_button_6.setText(_translate("MainWindow", "Далее"))
