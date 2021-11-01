@@ -175,13 +175,12 @@ class Mechanism:
                     dot.omega = self.initial_link.points[0].path.dots[i].omega
 
     def get_preview_image(self):
-        self.demonstration_frame = minimize(self.demonstration_frame, consts.PREVIEW_MINIMIZATION_SCALE)
         self.initial_link.draw_on_frame(self.demonstration_frame, self.demonstration_frame_num)
 
         for link in self.links:
             link.draw_on_frame(self.demonstration_frame, self.demonstration_frame_num)
 
-        return self.demonstration_frame
+        return minimize(self.demonstration_frame, consts.PREVIEW_MINIMIZATION_SCALE)
 
     @staticmethod
     def video_fits(filename: str) -> bool:

@@ -2172,7 +2172,7 @@
 </string>
           </property>
           <property name="text">
-           <string>Расчет аналогов скоростей</string>
+           <string>Расчет аналогов скоростей и ускорений</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>

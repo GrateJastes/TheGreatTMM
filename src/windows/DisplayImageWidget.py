@@ -5,8 +5,6 @@ class DisplayImageWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         self.image = None
         super(DisplayImageWidget, self).__init__(parent)
-        self.setGeometry(300, 300, 600, 800)
-        self.setMaximumSize(600, 800)
         self.setWindowTitle('Предпросмотр')
 
         self.image_frame = QtWidgets.QLabel()
