@@ -20,4 +20,4 @@ class Point:
 
 # returns a path object - [dot, dot, dot, ...] for an interpolated path
     def interpolated_path(self, base):
-        return diff_utils.interpolate(self, base).path
+        return diff_utils.linear_interpolate(self, base).path

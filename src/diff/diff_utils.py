@@ -2,6 +2,7 @@ import math
 
 import findiff
 import numpy as np
+from scipy import interpolate
 from scipy.optimize import curve_fit
 
 from src import common_entities
@@ -9,7 +10,7 @@ from src.common_entities.Unit import Unit
 from src.diff import consts
 
 
-def interpolate(point, base):
+def linear_interpolate(point, base):
     ip_point = common_entities.Point(point.name + '(ip)')
     dot_list = []
     for i in np.arange(0, 2 * math.pi + consts.STEP_SPLITTING, consts.STEP_SPLITTING):
@@ -55,14 +56,15 @@ def backward_difference_1(ip_point, type_of_coord):
 
 
 def diff1(point, base):
-    ip_dot_list = interpolate(point, base)
+    ip_dot_list = linear_interpolate(point, base)
     v_list = [Unit(forward_difference_1(ip_dot_list, 'x'), forward_difference_1(ip_dot_list, 'y'))]
     for i in range(1, len(ip_dot_list.path.dots) - 1):
         v_list.append(Unit(central_difference_1(ip_dot_list, i, 'x'),
                            central_difference_1(ip_dot_list, i, 'y')))
     v_list.append(Unit(backward_difference_1(ip_dot_list, 'x'), backward_difference_1(ip_dot_list, 'y')))
-    v_list_pol = optimize_curve(v_list)
     # v_list_pol = data_fit(v_list)
+    v_list_pol = data_interpolate(v_list)
+    # v_list_pol = v_list
     return v_list_pol
 
 
@@ -100,12 +102,14 @@ def backward_difference_2(ip_point, type_of_coord):
 
 
 def diff2(point, base):
-    ip_dot_list = interpolate(point, base)
+    ip_dot_list = linear_interpolate(point, base)
     a_list = [Unit(forward_difference_2(ip_dot_list, 'x'), forward_difference_2(ip_dot_list, 'y'))]
     for num in range(1, len(ip_dot_list.path.dots) - 1):
         a_list.append(Unit(central_difference_2(ip_dot_list, num, 'x'), central_difference_2(ip_dot_list, num, 'y')))
     a_list.append(Unit(backward_difference_2(ip_dot_list, 'x'), backward_difference_2(ip_dot_list, 'y')))
-    a_list_pol = data_fit(a_list)
+    # a_list_pol = data_fit(a_list)
+    a_list_pol = data_interpolate(a_list)
+    # a_list_pol = a_list
     return a_list_pol
 
 
@@ -128,7 +132,7 @@ def data_fit(data_list):
 
 
 def diff2_fd(point, base):
-    ip_dot_list = interpolate(point, base)
+    ip_dot_list = linear_interpolate(point, base)
     a_list = []
     d_do = findiff.FinDiff(0, consts.STEP_SPLITTING, 2, acc=4)
     x_array = np.array([dot.x for dot in ip_dot_list.path.dots])
@@ -141,16 +145,42 @@ def diff2_fd(point, base):
     return a_list_pol
 
 
+def data_interpolate(data_list):
+    omega_list = [item * consts.STEP_SPLITTING for item in range(len(data_list))]
+    omega_int = np.linspace(omega_list[0], omega_list[-1], 200)
+    tck_x = interpolate.splrep(omega_list, [unit.x for unit in data_list], k=3, s=1120)
+    int_x = interpolate.splev(omega_int, tck_x, der=0)
+    tck_y = interpolate.splrep(omega_list, [unit.y for unit in data_list], k=3, s=1120)
+    int_y = interpolate.splev(omega_int, tck_y, der=0)
+    data_list_pol = []
+    for i in range(len(data_list)):
+        data_list_pol.append(Unit(int_x[i], int_y[i]))
+    return data_list_pol
+
+
 def optimize_curve(data_list):
-    fx = polinom([item * consts.STEP_SPLITTING for item in range(len(data_list))],
-                 [unit.x for unit in data_list])
-    poptx, pcovx = curve_fit(fx, np.linspace(0, 2 * np.pi + consts.STEP_SPLITTING, len(data_list)),
-                             [unit.x for unit in data_list])
-    fy = polinom([item * consts.STEP_SPLITTING for item in range(len(data_list))],
-                 [unit.y for unit in data_list])
-    popty, pcovy = curve_fit(fy, np.linspace(0, 2 * np.pi + consts.STEP_SPLITTING, len(data_list)),
-                             [unit.y for unit in data_list])
+    # fx = polinom([item * consts.STEP_SPLITTING for item in range(len(data_list))],
+    #              [unit.x for unit in data_list])
+    omega_list = [item * consts.STEP_SPLITTING for item in range(len(data_list))]
+    # fx = func_x(omega_list, data_list)
+    poptx, pcovx = curve_fit(func_x, omega_list,
+                             [unit.x for unit in data_list], p0=data_list)
+    # fy = polinom([item * consts.STEP_SPLITTING for item in range(len(data_list))],
+    #              [unit.y for unit in data_list])
+    # fy = func_y(omega_list, data_list)
+    popty, pcovy = curve_fit(func_y, omega_list,
+                             [unit.y for unit in data_list], p0=data_list)
     data_list_pol = []
     for i in range(len(data_list)):
         data_list_pol.append(Unit(poptx[i], popty[i]))
     return data_list_pol
+
+
+def func_y(omega, other_list):
+    i = omega // consts.STEP_SPLITTING
+    return other_list[i].y
+
+
+def func_x(omega, other_list):
+    i = omega // consts.STEP_SPLITTING
+    return other_list[i].x
