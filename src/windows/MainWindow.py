@@ -283,11 +283,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             plot_widget = pg.GraphicsLayoutWidget(show=True)
             pg.setConfigOptions(antialias=True)
 
-            plot_widget.addPlot(
+            p0 = plot_widget.addPlot(
                 title='Point %s path' % point.name,
                 x=[dot.x for dot in path],
-                y=[dot.y for dot in path]
+                y=[dot.y for dot in path],
+                pen=pg.mkPen(consts.BGR.RED, width=2)
             )
+            p0.showGrid(x=True, y=True)
             plot_win.verticalLayout.addWidget(plot_widget)
 
             self.plot_path_windows.append(plot_win)
@@ -311,12 +313,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             win.setWindowTitle('Аналоги скорости и ускорения точки %s' % point.name)
 
             p1 = win.addPlot(title='Аналоги скорости')
-            p1.plot(y=speed_x, x=angle, name='Vx', pen=consts.BGR.RED)
-            p1.plot(y=speed_y, x=angle, name='Vy', pen=consts.BGR.GREEN)
+            Vx_plot = p1.plot(y=speed_x, x=angle, name='Vx', pen=pg.mkPen(consts.BGR.RED, width=2))
+            Vy_plot = p1.plot(y=speed_y, x=angle, name='Vy', pen=pg.mkPen(consts.BGR.GREEN, width=2))
+
+            p1.showGrid(x=True, y=True)
+
+            legend = pg.LegendItem((80, 60), offset=(70, 20))
+            legend.setParentItem(p1)
+            legend.addItem(Vx_plot, 'Vx')
+            legend.addItem(Vy_plot, 'Vy')
+
 
             p2 = win.addPlot(title='Аналоги ускорения')
-            p2.plot(y=acc_x, x=angle, name='ax', pen=consts.BGR.RED)
-            p2.plot(y=acc_y, x=angle, name='ay', pen=consts.BGR.GREEN)
+            ax_plot = p2.plot(y=acc_x, x=angle, name='ax', pen=pg.mkPen(consts.BGR.RED, width=2))
+            ay_plot = p2.plot(y=acc_y, x=angle, name='ay', pen=pg.mkPen(consts.BGR.GREEN, width=2))
+
+            p2.showGrid(x=True, y=True)
+
+            legend = pg.LegendItem((80, 60), offset=(70, 20))
+            legend.setParentItem(p2)
+            legend.addItem(ax_plot, 'ax')
+            legend.addItem(ay_plot, 'ay')
 
             self.plot_speed_windows.append(win)
 
@@ -350,6 +367,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
 class WindowMaker(object):
     def __init__(self):
+        pg.setConfigOption('background', 'w')
+        pg.setConfigOption('foreground', 'k')
         self.window = MainWindow()
 
     def make_main_window(self) -> MainWindow:
