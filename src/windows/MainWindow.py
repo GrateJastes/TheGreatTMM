@@ -283,12 +283,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             plot_widget = pg.GraphicsLayoutWidget(show=True)
             pg.setConfigOptions(antialias=True)
 
-            p0 = plot_widget.addPlot(
-                title='Point %s path' % point.name,
-                x=[dot.x for dot in path],
-                y=[dot.y for dot in path],
-                pen=pg.mkPen(consts.BGR.RED, width=2)
-            )
+            p0 = plot_widget.addPlot(title='Point %s path' % point.name)
+
+            point_plot = p0.plot(x=[dot.x for dot in path],
+                                 y=[dot.y for dot in path],
+                                 pen=pg.mkPen(consts.BGR.RED, width=1), 
+                                 symbol='o')
+            point_plot_ip = p0.plot(x=[dot.x for dot in point.interpolated_path(point).dots],
+                                    y=[dot.y for dot in point.interpolated_path(point).dots],
+                                    pen=pg.mkPen('r', width=4), 
+                                    symbol='o')
+
+            legend = pg.LegendItem((80, 60))
+            legend.setParentItem(p0)
+            legend.addItem(point_plot, 'Распознанная траектория')
+            legend.addItem(point_plot_ip, 'Преобразованная траектория')
+
             p0.showGrid(x=True, y=True)
             plot_win.verticalLayout.addWidget(plot_widget)
 
