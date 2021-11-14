@@ -277,6 +277,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def show_point_path(self, point: Point):
         def show_path():
+            base_point = self.mechanism.initial_link.points[0]
             path = point.path.dots
             plot_win = PlotWindow()
             plot_win.setWindowTitle('Точка %s' % point.name)
@@ -289,8 +290,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                  y=[dot.y for dot in path],
                                  pen=pg.mkPen(consts.BGR.RED, width=1), 
                                  symbol='o')
-            point_plot_ip = p0.plot(x=[dot.x for dot in point.interpolated_path(point).dots],
-                                    y=[dot.y for dot in point.interpolated_path(point).dots],
+            point_plot_ip = p0.plot(x=[dot.x for dot in point.interpolated_path(base_point).dots],
+                                    y=[dot.y for dot in point.interpolated_path(base_point).dots],
                                     pen=pg.mkPen('r', width=4), 
                                     symbol='o')
 

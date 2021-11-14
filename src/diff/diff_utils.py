@@ -31,16 +31,9 @@ def crop_path(point, base):
 def path_smoothing(point, base):
     ip_point = common_entities.Point(point.name + '(ip)')
     dot_list = []
+    point.remove_dot_repeat()
+    base.remove_dot_repeat()
     x, y, base_x, base_y = crop_path(point, base)
-    i = 0
-    while i < len(base_x) - 1:
-        if (base_x[i] == base_x[i + 1]) and (base_y[i] == base_y[i + 1]):
-            x.pop(i)
-            y.pop(i)
-            base_x.pop(i)
-            base_y.pop(i)
-        else:
-            i += 1
     x.append(x[0])
     y.append(y[0])
     xy = [x, y]
@@ -102,9 +95,9 @@ def diff1(point, base):
         v_list.append(Unit(central_difference_1(ip_dot_list, i, 'x'),
                            central_difference_1(ip_dot_list, i, 'y')))
     v_list.append(Unit(extreme_difference_1(ip_dot_list, 'x'), extreme_difference_1(ip_dot_list, 'y')))
-    # v_list_pol = data_fit(v_list)
+    v_list_pol = data_fit(v_list)
     # v_list_pol = data_interpolate(v_list)
-    v_list_pol = v_list
+    # v_list_pol = v_list
     return v_list_pol
 
 
@@ -148,9 +141,9 @@ def diff2(point, base):
     for num in range(1, len(ip_dot_list.path.dots) - 1):
         a_list.append(Unit(central_difference_2(ip_dot_list, num, 'x'), central_difference_2(ip_dot_list, num, 'y')))
     a_list.append(Unit(extreme_difference_2(ip_dot_list, 'x'), extreme_difference_2(ip_dot_list, 'y')))
-    # a_list_pol = data_fit(a_list)
+    a_list_pol = data_fit(a_list)
     # a_list_pol = data_interpolate(a_list)
-    a_list_pol = a_list
+    # a_list_pol = a_list
     return a_list_pol
 
 
