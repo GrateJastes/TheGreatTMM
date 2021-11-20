@@ -1,3 +1,6 @@
+import numpy as np
+from scipy.optimize import fmin
+from scipy.spatial.distance import cdist
 from PyQt5.QtWidgets import QProgressBar
 from cv2 import cv2
 import cv2.aruco
@@ -134,27 +137,25 @@ class Mechanism:
         return result_dots
 
     def find_origin(self, first_circle_dots: list[Dot]):
-        # initial_dots = self.initial_link.points[0].path.dots
         initial_dots = first_circle_dots
+        x = np.array([dot.x for dot in initial_dots])
+        y = np.array([dot.y for dot in initial_dots])
 
-        sumX = 0
-        sumY = 0
+        xm = x.mean()
+        ym = y.mean()
 
-        missedDots = 0
+        cm = np.array([xm, ym]).reshape(1, 2)
+        rm = cdist(cm, np.array([x, y]).T).mean()
 
-        for dot in initial_dots:
-            if dot.x is None:
-                missedDots += 1
-                continue
+        def err(average_values):
+            pts = [np.linalg.norm([x0 - average_values[0],
+                                   y0 - average_values[1]])
+                   - average_values[2] for x0, y0 in zip(x, y)]
+            return (np.array(pts) ** 2).sum()
 
-            sumX += dot.x
-            sumY += dot.y
+        xf, yf, rf = fmin(err, x0=[xm, ym, rm], disp=False)
 
-        foundDots = (len(initial_dots) - missedDots)
-        originX = sumX / foundDots
-        originY = sumY / foundDots
-
-        self.origin = (int(originX), int(originY))
+        self.origin = (int(xf), int(yf))
 
     def traverse_all_coordinates(self):
         for dot in self.initial_link.points[0].path.dots:
