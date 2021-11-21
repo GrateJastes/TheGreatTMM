@@ -38,9 +38,9 @@ class Mechanism:
     # but it affects on Mechanism's inner instances and makes it real to work with Link's data arrays
     def research_input(self, progress_bar: QProgressBar = None):
         self.process_video_input(progress_bar)
-        # self.find_origin(self.first_circle_dots())
-        # self.traverse_all_coordinates()
-        # self.find_all_omegas()
+        self.find_origin(self.first_circle_dots())
+        self.traverse_all_coordinates()
+        self.find_all_omegas()
 
         if progress_bar is not None:
             progress_bar.setValue(consts.PROGRESS_BAR_MAX)
@@ -57,7 +57,6 @@ class Mechanism:
         total_frames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
         frame_per_percent = int(total_frames / consts.PROGRESS_BAR_MAX)
         frame_num = 0
-        print(total_frames)
 
         demonstration_frame_ready = False
         while True:

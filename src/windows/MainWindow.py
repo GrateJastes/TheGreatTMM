@@ -285,9 +285,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             pg.setConfigOptions(antialias=True)
 
             p0 = plot_widget.addPlot(title='Point %s path' % point.name)
+            X = point.get_coord_for_plot('x')
+            Y = point.get_coord_for_plot('y')
 
-            point_plot = p0.plot(x=[dot.x for dot in path],
-                                 y=[dot.y for dot in path],
+            point_plot = p0.plot(x=X,
+                                 y=Y,
                                  pen=pg.mkPen(consts.BGR.RED, width=1), 
                                  symbol='o')
             point_plot_ip = p0.plot(x=[dot.x for dot in point.interpolated_path(base_point).dots],
@@ -333,7 +335,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             legend.setParentItem(p1)
             legend.addItem(Vx_plot, 'Vx')
             legend.addItem(Vy_plot, 'Vy')
-
 
             p2 = win.addPlot(title='Аналоги ускорения')
             ax_plot = p2.plot(y=acc_x, x=angle, name='ax', pen=pg.mkPen(consts.BGR.RED, width=2))
