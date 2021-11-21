@@ -62,21 +62,22 @@ class Link:
 
         # This condition means that we didn't find enough markers to describe all of the PoI on the Link. In current
         # version of the app we just discard whole frame for the Link in this case. TODO: research what we can
-        if len(matches) + len(rest_markers) < len(self.points):
-            research_ok = False
+        # if len(matches) + len(rest_markers) < len(self.points):
+        #     return False
 
-        # Finding markers for points which have no points in their paths' yet.
+        # Finding markers for points which have no dots in their paths' yet.
         rest_markers_iter = iter(rest_markers)
         for point in self.points:
-            if point.path.last_dot is None:
-                research_ok = False
+            if point.path.last_dot == (None, None):
+                research_ok = True
                 try:
                     point.path.append(next(rest_markers_iter))
-                    research_ok = True
                 # If there is some PoI which isn't matched to any marker yet, but markers are already out, we
                 # must exit the cycle and drop the current frame's research for this Link.
                 except StopIteration:
-                    break
+                    point.path.append((None, None))
+
+                continue
 
             # But if we have found the next dot to the point's path, we could append it and proceed further
             if point.path.last_dot in matches.keys():
@@ -97,7 +98,7 @@ class Link:
 
         # First of all we are looking for markers which are closest to every dot on the ends of the paths
         for last_dot in last_dots:
-            if last_dot is None:
+            if last_dot is None or last_dot[0] is None:
                 continue
 
             closest_marker = find_closest(last_dot, markers)
@@ -126,6 +127,8 @@ class Link:
 
     def draw_on_frame(self, frame, frame_num):
         for point in self.points:
+            if len(point.path.dots) < frame_num + 1:
+                continue
             point_coords = (
                 point.path.dots[frame_num].x,
                 point.path.dots[frame_num].y,

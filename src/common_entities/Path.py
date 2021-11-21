@@ -9,7 +9,7 @@ class Path:
     def __init__(self):
         self.dots = []
         self.missed_dots = 0
-        self.last_dot = None
+        self.last_dot = (None, None)
 
     def append(self, coords: tuple):
         self.last_dot = coords

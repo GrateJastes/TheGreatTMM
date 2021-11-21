@@ -1,3 +1,5 @@
+import numpy as np
+
 from .Path import Path
 from src.diff import diff_utils
 from src.diff import consts as diff_consts
@@ -59,3 +61,9 @@ class Point:
                     k += 1
                 self.fill_dots(i, k)
                 # print(self.name, i, [(self.path.dots[i].x, self.path.dots[i].y) for i in range(len(self.path.dots))])
+
+    def get_coord_for_plot(self, coord_name: str) -> np.array:
+        if coord_name == 'x':
+            return np.array([dot.x if dot.x is not None else np.nan for dot in self.path.dots])
+        else:
+            return np.array([dot.y if dot.y is not None else np.nan for dot in self.path.dots])

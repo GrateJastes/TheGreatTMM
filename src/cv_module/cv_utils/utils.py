@@ -80,14 +80,14 @@ def find_omega(desired_dot):
     return omega
 
 
-def find_closest(last_dot, candidates):
+def find_closest(origin, candidates):
     total_min = None
-    result = None
+    result = (None, None)
     for candidate in candidates:
-        if candidate is None:
+        if candidate is None or candidate[0] is None:
             continue
 
-        dist = math.sqrt((candidate[0] - last_dot[0]) ** 2 + (candidate[1] - last_dot[1]) ** 2)
+        dist = math.sqrt((candidate[0] - origin[0]) ** 2 + (candidate[1] - origin[1]) ** 2)
         if total_min is None or dist < total_min:
             total_min = dist
             result = candidate
