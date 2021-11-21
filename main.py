@@ -17,7 +17,8 @@ def main():
     window = window_maker.make_main_window()
     window.show()
 
-    sys.exit(app.exec_())
+    app.exec_()
+    sys.exit()
 
 
 def test():

@@ -1,5 +1,5 @@
 import os
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import QFileDialog, QApplication, QMessageBox, QWidget, QVBoxLayout, QLabel, QHBoxLayout, \
     QPushButton
 
@@ -40,6 +40,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.researchPathsButton.clicked.connect(self.set_trajectories_page)
         self.researchAnalogs.clicked.connect(self.set_speeds_page)
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.preview_window.destroy()
+        for window in self.plot_path_windows + self.plot_speed_windows:
+            window.destroy()
+        a0.accept()
 
     def set_screen_geometry(self):
         screen_geometry = QApplication.desktop().screenGeometry()
