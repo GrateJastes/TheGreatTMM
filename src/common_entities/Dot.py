@@ -3,6 +3,8 @@ import math
 
 class Dot:
     """Just a dot on the XoY plane, but with the generalized coordinate of the mechanism"""
+    x: int
+    y: int
 
     def __init__(self, _x, _y):
         self.x = _x

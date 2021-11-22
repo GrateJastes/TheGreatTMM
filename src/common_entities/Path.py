@@ -1,16 +1,17 @@
-from .Dot import AnalogDot
+from .Dot import AnalogDot, Dot
 
 
 class Path:
     """Represents the path of the point of interest"""
-    missed_dots = int
-    last_dot = ()
+    dots: list[AnalogDot]
+    missed_dots: int
+    last_dot_coords: tuple
 
     def __init__(self):
-        self.dots = []
         self.missed_dots = 0
-        self.last_dot = None
+        self.dots = []
+        self.last_dot_coords = (None, None)
 
-    def append(self, coords: tuple):
-        self.last_dot = coords
+    def append(self, coords: tuple) -> None:
+        self.last_dot_coords = coords
         self.dots.append(AnalogDot((coords[0], coords[1]), None))

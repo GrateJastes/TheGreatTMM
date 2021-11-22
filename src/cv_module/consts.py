@@ -55,7 +55,7 @@ class DebugMode:
 
 # Chose the right HSV color bounds to prepare frame for processing. It depends on link, which is being researching now
 # and it's predefined color
-def get_bound_colors(color):
+def get_bound_colors(color: tuple[int, int, int]) -> tuple[np.ndarray, np.ndarray]:
     return {
         BGR.RED: (HSV.LOWER_RED, HSV.UPPER_RED),
         BGR.BLUE: (HSV.LOWER_BLUE, HSV.UPPER_BLUE),
@@ -75,4 +75,5 @@ PREVIEW_POINT_CENTRE_THICKNESS = 2
 PREVIEW_POINT_TEXT_THICKNESS = 2
 PREVIEW_POINT_TEXT_SHIFT = 10
 PREVIEW_POINT_FONT_SCALE = 1
-PREVIEW_MINIMIZATION_SCALE = 1.5
+PREVIEW_WINDOW_W = 600
+PREVIEW_WINDOW_H = 340
