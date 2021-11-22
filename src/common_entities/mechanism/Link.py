@@ -1,6 +1,7 @@
+import numpy as np
 from cv2 import cv2
 
-from src import common_entities
+from src import common_entities as ce
 from src.cv_module import consts
 from src.cv_module.cv_utils.utils import *
 from src.cv_module.cv_utils.geometry import ellipse_area
@@ -9,10 +10,17 @@ from src.cv_module.cv_utils.geometry import ellipse_area
 # The class which represents the link of a mechanism. It can be researched independently from Mechanism in a particular
 # state when the needed data is provided.
 class Link:
-    is_initial = bool
-    points = [common_entities.Point]
+    is_initial: bool
+    points: list[ce.Point]
+    link_id: int
+    color: tuple[int, int, int]
+    color_bounds: tuple[np.ndarray, np.ndarray]
 
-    def __init__(self, color, points, is_initial=False, link_id=0):
+    def __init__(self,
+                 color: tuple[int, int, int],
+                 points: list[ce.Point],
+                 is_initial=False,
+                 link_id=0):
         self.color = color
         self.points = points
         self.is_initial = is_initial
@@ -20,7 +28,7 @@ class Link:
 
         self.color_bounds = consts.get_bound_colors(color)
 
-    def research_link(self, start_frame) -> bool:
+    def research_link(self, start_frame: np.ndarray) -> bool:
         research_ok = True
 
         # First of all we preparing frame and converting it to binary image. It is made to research the current link's
@@ -56,7 +64,7 @@ class Link:
         markers = [(int(ellipse[0][0]), int(ellipse[0][1])) for ellipse in signatures]
 
         # Making list of the last dots to every PoI.
-        last_dots = [point.path.last_dot for point in self.points]
+        last_dots = [point.path.last_dot_coords for point in self.points]
         # Finding closest matches between the provided markers and the last dots on PoIs' paths
         matches, rest_markers = self.__find_matches(last_dots, markers)
 
@@ -68,7 +76,7 @@ class Link:
         # Finding markers for points which have no dots in their paths' yet.
         rest_markers_iter = iter(rest_markers)
         for point in self.points:
-            if point.path.last_dot == (None, None):
+            if point.path.last_dot_coords == (None, None):
                 research_ok = True
                 try:
                     point.path.append(next(rest_markers_iter))
@@ -80,14 +88,17 @@ class Link:
                 continue
 
             # But if we have found the next dot to the point's path, we could append it and proceed further
-            if point.path.last_dot in matches.keys():
-                point.path.append(matches[point.path.last_dot])
+            if point.path.last_dot_coords in matches.keys():
+                point.path.append(matches[point.path.last_dot_coords])
                 research_ok = True
 
         return research_ok
 
     # Private method for local usage. Returns found matches (dict. markers to dots) and the rejected markers
-    def __find_matches(self, last_dots, markers):
+    def __find_matches(self,
+                       last_dots: list[tuple],
+                       markers: list[tuple[int, int]]
+                       ) -> (dict, list[tuple[int, int]]):
         # We need to ensure that there are markers unambiguously correlated with the last
         # dots on paths and vice versa.
         markers_to_dots_closests = {}
@@ -121,11 +132,11 @@ class Link:
         # After all we return the confirmed matches and the markers which don't have any close 'last dots' to them
         return final_matches, markers
 
-    def miss_frame(self):
+    def miss_frame(self) -> None:
         for point in self.points:
             point.path.append((None, None))
 
-    def draw_on_frame(self, frame, frame_num):
+    def draw_on_frame(self, frame: np.ndarray, frame_num: int) -> None:
         for point in self.points:
             if len(point.path.dots) < frame_num + 1:
                 continue

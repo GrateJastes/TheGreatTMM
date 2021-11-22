@@ -6,6 +6,12 @@ from src.diff import consts as diff_consts
 
 
 class Point:
+    path: Path
+    is_base: bool
+    name: str
+    speed: list
+    acceleration: list
+
     def __init__(self, name: str, is_base=False):
         self.is_base = is_base
         self.name = name

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 from scipy.optimize import fmin
 from scipy.spatial.distance import cdist
@@ -9,25 +11,32 @@ from src.cv_module import consts
 from .Link import Link
 
 # noinspection PyTypeChecker
-from .. import Dot
+from .. import Dot, Point
 from ...cv_module.cv_utils import distance, minimize
 
 
 class Mechanism:
+    video: cv2.VideoCapture
+    initial_link: Link
+    links: list[Link]
+    origin: tuple[int, int]
+    demo_frame: np.ndarray
+    demo_frame_index: int
+    preview_image: np.ndarray
+
     def __init__(self, path_to_file):
         self.video = cv2.VideoCapture(path_to_file)
-        self.initial_link = None
         self.links = []
-        self.origin = None
-        self.demonstration_frame = None
-        self.demonstration_frame_num = None
-        self.preview_image = None
 
     def __del__(self):
         self.video.release()
 
     # Add link to the Mechanism. Can be used before research, on the configuring stage.
-    def set_new_link(self, link_color, points, is_initial, link_id=0):
+    def set_new_link(self,
+                     link_color: tuple[int, int, int],
+                     points: list[Point],
+                     is_initial: bool,
+                     link_id=0) -> None:
         link = Link(link_color, points, is_initial, link_id)
         if is_initial:
             self.initial_link = link
@@ -36,7 +45,7 @@ class Mechanism:
 
     # Researches provided video input after mechanism is configured and ready to go. This method returns nothing,
     # but it affects on Mechanism's inner instances and makes it real to work with Link's data arrays
-    def research_input(self, progress_bar: QProgressBar = None):
+    def research_input(self, progress_bar: QProgressBar = None) -> None:
         self.process_video_input(progress_bar)
         self.find_origin(self.first_circle_dots())
         self.traverse_all_coordinates()
@@ -45,7 +54,7 @@ class Mechanism:
         if progress_bar is not None:
             progress_bar.setValue(consts.PROGRESS_BAR_MAX)
 
-    def research_analogs(self):
+    def research_analogs(self) -> None:
         initial_point = self.initial_link.points[0]
         initial_point.point_analysis(initial_point)
 
@@ -56,9 +65,9 @@ class Mechanism:
     def process_video_input(self, progress_bar: QProgressBar = None):
         total_frames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
         frame_per_percent = int(total_frames / consts.PROGRESS_BAR_MAX)
-        frame_num = 0
+        frame_index = 0
 
-        demonstration_frame_ready = False
+        demo_frame_ready = False
         while True:
             frame_is_full = True
 
@@ -80,14 +89,14 @@ class Mechanism:
                     link.miss_frame()
                     frame_is_full = False
 
-            if not demonstration_frame_ready and frame_is_full:
-                self.demonstration_frame = start_frame
-                self.demonstration_frame_num = frame_num
+            if not demo_frame_ready and frame_is_full:
+                self.demo_frame = start_frame
+                self.demo_frame_index = frame_index
                 frame_is_full = True
 
-            frame_num += 1
-            if frame_num % (frame_per_percent + 1) == 0 and progress_bar is not None:
-                progress_bar.setValue(frame_num / frame_per_percent)
+            frame_index += 1
+            if frame_index % (frame_per_percent + 1) == 0 and progress_bar is not None:
+                progress_bar.setValue(frame_index / frame_per_percent)
 
         self.preview_image = self.get_preview_image()
 
@@ -136,7 +145,7 @@ class Mechanism:
 
         return result_dots
 
-    def find_origin(self, first_circle_dots: list[Dot]):
+    def find_origin(self, first_circle_dots: list[Dot]) -> None:
         initial_dots = first_circle_dots
         x = np.array([dot.x for dot in initial_dots])
         y = np.array([dot.y for dot in initial_dots])
@@ -157,7 +166,7 @@ class Mechanism:
 
         self.origin = (int(xf), int(yf))
 
-    def traverse_all_coordinates(self):
+    def traverse_all_coordinates(self) -> None:
         for dot in self.initial_link.points[0].path.dots:
             dot.traverse_coords(self.origin)
 
@@ -166,7 +175,7 @@ class Mechanism:
                 for dot in point.path.dots:
                     dot.traverse_coords(self.origin)
 
-    def find_all_omegas(self):
+    def find_all_omegas(self) -> None:
         for dot in self.initial_link.points[0].path.dots:
             dot.set_self_omega()
 
@@ -175,13 +184,20 @@ class Mechanism:
                 for i, dot in enumerate(point.path.dots):
                     dot.omega = self.initial_link.points[0].path.dots[i].omega
 
-    def get_preview_image(self):
-        self.initial_link.draw_on_frame(self.demonstration_frame, self.demonstration_frame_num)
+    def get_preview_image(self) -> np.ndarray:
+        self.initial_link.draw_on_frame(self.demo_frame, self.demo_frame_index)
 
         for link in self.links:
-            link.draw_on_frame(self.demonstration_frame, self.demonstration_frame_num)
+            link.draw_on_frame(self.demo_frame, self.demo_frame_index)
 
-        return minimize(self.demonstration_frame, consts.PREVIEW_MINIMIZATION_SCALE)
+        width = self.video.get(3)
+        height = self.video.get(4)
+
+        print(width, height)
+        minimize_index = min([width / consts.PREVIEW_WINDOW_W, height / consts.PREVIEW_WINDOW_H])
+        print(minimize_index)
+
+        return minimize(self.demo_frame, minimize_index)
 
     @staticmethod
     def video_fits(filename: str) -> bool:

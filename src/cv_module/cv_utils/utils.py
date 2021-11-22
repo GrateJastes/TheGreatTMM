@@ -80,7 +80,7 @@ def find_omega(desired_dot):
     return omega
 
 
-def find_closest(origin, candidates):
+def find_closest(origin: tuple[int, int], candidates: list[tuple]) -> tuple:
     total_min = None
     result = (None, None)
     for candidate in candidates:

@@ -1,7 +1,7 @@
 import os
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import QFileDialog, QApplication, QMessageBox, QWidget, QVBoxLayout, QLabel, QHBoxLayout, \
-    QPushButton
+    QPushButton, QComboBox, QCheckBox, QSpinBox
 
 from src.common_entities import Point
 from src.common_entities.mechanism.Link import Link
@@ -24,37 +24,42 @@ def get_color_name(russian_name: str) -> tuple:
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    form_links: list[QWidget]
+    link_color_fields: list[QComboBox]
+    link_name_fields: list[QComboBox]
+    initial_link_checks: list[QCheckBox]
+    link_point_counters: list[QSpinBox]
+    plot_path_windows: list[QWidget]
+    plot_speed_windows: list[QWidget]
+    mechanism: Mechanism
+    preview_window: DisplayImageWidget
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('The Great TMM')
-        self.form_links = []
-        self.link_colors = []
-        self.link_names = []
-        self.link_points = []
-        self.initial_links = []
+
         self.plot_path_windows = []
         self.plot_speed_windows = []
-        self.mechanism = None
-        self.preview_window = None
 
         self.researchPathsButton.clicked.connect(self.set_trajectories_page)
         self.researchAnalogs.clicked.connect(self.set_speeds_page)
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
-        self.preview_window.destroy()
+        if self.preview_window is not None:
+            self.preview_window.destroy()
         for window in self.plot_path_windows + self.plot_speed_windows:
             window.destroy()
         a0.accept()
 
-    def set_screen_geometry(self):
+    def set_screen_geometry(self) -> None:
         screen_geometry = QApplication.desktop().screenGeometry()
         x = (screen_geometry.width() - self.width()) / 2
         y = (screen_geometry.height() - self.height()) / 2
         self.move(x, y)
 
     # noinspection DuplicatedCode
-    def set_navigation(self):
+    def set_navigation(self) -> None:
         self.stackedWidget.setCurrentIndex(0)
 
         self.next_button_1.clicked.connect(self.next_page)
@@ -72,7 +77,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.next_button_5.hide()
         self.next_button_6.hide()
 
-    def set_upload_logic(self):
+    def set_upload_logic(self) -> None:
         self.next_button_2.hide()
         self.fileErrorMessage.hide()
 
@@ -90,7 +95,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.linkForm_6,
         ]
 
-        self.link_colors = [
+        self.link_color_fields = [
             self.link_1_color,
             self.link_2_color,
             self.link_3_color,
@@ -99,7 +104,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.link_6_color,
         ]
 
-        self.link_points = [
+        self.link_point_counters = [
             self.link_1_points,
             self.link_2_points,
             self.link_3_points,
@@ -108,7 +113,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.link_6_points,
         ]
 
-        self.link_names = [
+        self.link_name_fields = [
             self.link_1_letter,
             self.link_2_letter,
             self.link_3_letter,
@@ -117,7 +122,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.link_6_letter,
         ]
 
-        self.initial_links = [
+        self.initial_link_checks = [
             self.link_1_initial,
             self.link_2_initial,
             self.link_3_initial,
@@ -132,12 +137,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.link_1_initial.setChecked(True)
         self.check_initial_boxes()
 
-        for check_box in self.initial_links:
+        for check_box in self.initial_link_checks:
             check_box.stateChanged.connect(self.check_initial_boxes)
 
         self.linksNumber.currentTextChanged.connect(self.update_link_forms)
 
-    def set_research_screen(self):
+    def set_research_screen(self) -> None:
         self.startResearchButton.clicked.connect(self.start_research)
 
         self.readyLabel.hide()
@@ -146,25 +151,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.progressBar.valueChanged.connect(self.show_ready_label)
 
-    def show_upload_next_btn(self):
-        self.next_button_2.show()
-
-    def next_page(self):
+    def next_page(self) -> None:
         curr_page_index = self.stackedWidget.currentIndex()
         if curr_page_index < self.stackedWidget.count() - 1:
             self.stackedWidget.setCurrentIndex(curr_page_index + 1)
 
-    def prev_page(self):
+    def prev_page(self) -> None:
         curr_page_index = self.stackedWidget.currentIndex()
         if curr_page_index > 0:
             self.stackedWidget.setCurrentIndex(curr_page_index - 1)
 
-    def browse_files(self):
+    def browse_files(self) -> None:
         filename = QFileDialog.getOpenFileName(self, 'Open video', os.getcwd(), 'Video (*.mp4 *.avi)')
         if filename != '':
             self.videoFilePath.setText(filename[0])
 
-    def check_provided_video(self):
+    def check_provided_video(self) -> None:
         filename = self.videoFilePath.text()
         video_ok = Mechanism.video_fits(filename)
 
@@ -174,21 +176,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.fileErrorMessage.show()
 
-    def update_link_forms(self):
-        last_link_number = self.linksNumber.currentIndex() + 1
+    def update_link_forms(self) -> None:
+        last_link_index = self.linksNumber.currentIndex() + 1
 
         for link in self.form_links:
             link.hide()
 
-        for i in range(last_link_number):
+        for i in range(last_link_index):
             self.form_links[i].show()
 
     def collect_links_data(self) -> [Link]:
         links = []
-        link_names = [field.currentText() for field in self.link_names]
-        link_colors = [get_color_name(field.currentText()) for field in self.link_colors]
-        links_initial = [field.isChecked() for field in self.initial_links]
-        links_amount_points = [int(field.value()) for field in self.link_points]
+        link_names = [field.currentText() for field in self.link_name_fields]
+        link_colors = [get_color_name(field.currentText()) for field in self.link_color_fields]
+        links_initial = [field.isChecked() for field in self.initial_link_checks]
+        links_amount_points = [int(field.value()) for field in self.link_point_counters]
         last_link_number = self.linksNumber.currentIndex() + 1
 
         for i in range(last_link_number):
@@ -220,18 +222,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def check_initial_boxes(self):
         checked_index = None
 
-        for i, check_box in enumerate(self.initial_links):
+        for i, check_box in enumerate(self.initial_link_checks):
             if check_box.isChecked():
                 checked_index = i
                 break
 
         if checked_index is None:
-            for check_box in self.initial_links:
+            for check_box in self.initial_link_checks:
                 check_box.setEnabled(True)
 
             return
 
-        for i, check_box in enumerate(self.initial_links):
+        for i, check_box in enumerate(self.initial_link_checks):
             if i == checked_index:
                 continue
 
@@ -239,7 +241,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def check_link_colors(self) -> bool:
         used_colors = []
-        for color_combo in self.link_colors:
+        for color_combo in self.link_color_fields:
             if color_combo.parentWidget().isHidden():
                 continue
 
@@ -279,12 +281,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for link in self.mechanism.links:
             self.add_link_activities(link, self.show_point_speeds, self.verticalLayout_12)
 
-        pass
-
     def show_point_path(self, point: Point):
         def show_path():
             base_point = self.mechanism.initial_link.points[0]
-            path = point.path.dots
             plot_win = PlotWindow()
             plot_win.setWindowTitle('Точка %s' % point.name)
             plot_widget = pg.GraphicsLayoutWidget(show=True)
