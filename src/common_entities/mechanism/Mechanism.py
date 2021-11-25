@@ -193,13 +193,11 @@ class Mechanism:
         width = self.video.get(3)
         height = self.video.get(4)
 
-        print(width, height)
-        aspect_ratio = width / height
-        minimize_index = max([width / consts.PREVIEW_WINDOW_W, height / consts.PREVIEW_WINDOW_H])
-        print(minimize_index)
+        minimize_index = round(max([width / consts.PREVIEW_WINDOW_W, height / consts.PREVIEW_WINDOW_H]))
+        if minimize_index == 0:
+            minimize_index = 1
 
-        return minimize(self.demo_frame, int(minimize_index))
-        # return self.demo_frame
+        return minimize(self.demo_frame, min([3, minimize_index]))
 
     @staticmethod
     def video_fits(filename: str) -> bool:
