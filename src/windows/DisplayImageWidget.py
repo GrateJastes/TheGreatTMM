@@ -8,8 +8,8 @@ class DisplayImageWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(DisplayImageWidget, self).__init__(parent)
         self.setWindowTitle('Предпросмотр')
-        self.setMaximumSize(600, 340)
-        self.setMinimumSize(600, 340)
+        # self.setMaximumSize(600, 340)
+        # self.setMinimumSize(600, 340)
 
         self.image_frame = QtWidgets.QLabel()
 

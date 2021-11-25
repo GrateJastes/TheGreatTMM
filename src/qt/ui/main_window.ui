@@ -57,7 +57,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>5</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="WelcomePage">
        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
@@ -462,8 +462,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
-             <width>724</width>
+             <y>-137</y>
+             <width>810</width>
              <height>901</height>
             </rect>
            </property>
@@ -639,6 +639,11 @@
                        <item>
                         <property name="text">
                          <string>Красный</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Желтый</string>
                         </property>
                        </item>
                        <item>
@@ -838,6 +843,11 @@
                        </item>
                        <item>
                         <property name="text">
+                         <string>Желтый</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
                          <string>Синий</string>
                         </property>
                        </item>
@@ -1026,6 +1036,11 @@
                        <item>
                         <property name="text">
                          <string>Красный</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Желтый</string>
                         </property>
                        </item>
                        <item>
@@ -1222,6 +1237,11 @@
                        </item>
                        <item>
                         <property name="text">
+                         <string>Желтый</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
                          <string>Синий</string>
                         </property>
                        </item>
@@ -1414,6 +1434,11 @@
                        </item>
                        <item>
                         <property name="text">
+                         <string>Желтый</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
                          <string>Синий</string>
                         </property>
                        </item>
@@ -1602,6 +1627,11 @@
                        <item>
                         <property name="text">
                          <string>Красный</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>Желтый</string>
                         </property>
                        </item>
                        <item>
