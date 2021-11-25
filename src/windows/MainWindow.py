@@ -20,6 +20,7 @@ def get_color_name(russian_name: str) -> tuple:
         'Красный': BGR.RED,
         'Синий': BGR.BLUE,
         'Зелёный': BGR.GREEN,
+        'Желтый': BGR.YELLOW,
     }.get(russian_name)
 
 
@@ -213,6 +214,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.preview_window = DisplayImageWidget()
         self.preview_window.show_image(self.mechanism.preview_image)
         self.preview_window.show()
+        self.preview_window.setFixedSize(self.preview_window.size())
 
     def show_ready_label(self):
         if self.progressBar.value() == consts.PROGRESS_BAR_MAX:

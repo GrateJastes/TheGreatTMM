@@ -194,13 +194,16 @@ class Mechanism:
         height = self.video.get(4)
 
         print(width, height)
-        minimize_index = min([width / consts.PREVIEW_WINDOW_W, height / consts.PREVIEW_WINDOW_H])
+        aspect_ratio = width / height
+        minimize_index = max([width / consts.PREVIEW_WINDOW_W, height / consts.PREVIEW_WINDOW_H])
         print(minimize_index)
 
-        return minimize(self.demo_frame, minimize_index)
+        return minimize(self.demo_frame, int(minimize_index))
+        # return self.demo_frame
 
     @staticmethod
     def video_fits(filename: str) -> bool:
+        return True
         video = cv2.VideoCapture(filename)
         try:
             if not video.isOpened():

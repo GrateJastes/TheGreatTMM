@@ -7,10 +7,16 @@ import numpy as np
 # HSV bounds for extracting presented color from the frame in preparing process.
 # Is being used in get_bound_colors() method
 class HSV:
-    LOWER_RED = np.array([0, 150, 133])
-    UPPER_RED = np.array([255, 255, 255])
-    LOWER_BLUE = np.array([109, 11, 68])
+    LOWER_RED = np.array([0, 211, 125])
+    UPPER_RED = np.array([255, 238, 168])
+    LOWER_BLUE = np.array([102, 100, 32])
     UPPER_BLUE = np.array([149, 255, 255])
+
+    LOWER_GREEN = np.array([57, 100, 32])
+    UPPER_GREEN = np.array([80, 255, 255])
+
+    LOWER_YELLOW = np.array([20, 90, 136])
+    UPPER_YELLOW = np.array([80, 255, 255])
 
 
 # Just colors preset in BGR (Blue--Green--Red) color scheme
@@ -59,6 +65,8 @@ def get_bound_colors(color: tuple[int, int, int]) -> tuple[np.ndarray, np.ndarra
     return {
         BGR.RED: (HSV.LOWER_RED, HSV.UPPER_RED),
         BGR.BLUE: (HSV.LOWER_BLUE, HSV.UPPER_BLUE),
+        BGR.GREEN: (HSV.LOWER_GREEN, HSV.UPPER_GREEN),
+        BGR.YELLOW: (HSV.LOWER_YELLOW, HSV.UPPER_YELLOW),
     }.get(color)
 
 
@@ -75,5 +83,5 @@ PREVIEW_POINT_CENTRE_THICKNESS = 2
 PREVIEW_POINT_TEXT_THICKNESS = 2
 PREVIEW_POINT_TEXT_SHIFT = 10
 PREVIEW_POINT_FONT_SCALE = 1
-PREVIEW_WINDOW_W = 600
-PREVIEW_WINDOW_H = 340
+PREVIEW_WINDOW_W = 960
+PREVIEW_WINDOW_H = 540
