@@ -15,9 +15,14 @@ __all__ = ['minimize',
            'find_closest',
            'remove_jumps',
            'distance',
+           'rescale',
            ]
 
 from ...common_entities import Dot
+
+
+def rescale(coords, scale):
+    return coords[0] * scale, coords[1] * scale
 
 
 def minimize(img, scale):
@@ -42,14 +47,20 @@ def find_marker_signatures(contours):
 
 
 def prepare_frame(frame, hsv_bounds):
-    blurred = cv2.medianBlur(frame, consts.MEDIAN_PREP_KERNEL)
-    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    # blurred = cv2.medianBlur(frame, consts.MEDIAN_PREP_KERNEL)
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     binary = cv2.inRange(hsv, hsv_bounds[0], hsv_bounds[1])
 
-    opened = cv2.morphologyEx(binary, cv2.MORPH_OPEN, consts.MORPH_OPEN_KERNEL)
-    closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, consts.MORPH_OPEN_KERNEL)
+    # opened = cv2.morphologyEx(binary, cv2.MORPH_OPEN, consts.MORPH_OPEN_KERNEL)
+    closed = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, consts.MORPH_CLOSE_KERNEL)
 
     smoothed = cv2.medianBlur(closed, consts.MEDIAN_BIN_KERNEL)
+
+
+    # closed = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, consts.MORPH_CLOSE_KERNEL)
+    # opened = cv2.morphologyEx(closed, cv2.MORPH_OPEN, consts.MORPH_OPEN_KERNEL)
+    #
+    # smoothed = cv2.medianBlur(opened, consts.MEDIAN_BIN_KERNEL)
 
     return smoothed
 

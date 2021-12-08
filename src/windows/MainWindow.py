@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import QFileDialog, QApplication, QMessageBox, QWidget, QVBoxLayout, QLabel, QHBoxLayout, \
@@ -33,7 +35,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     plot_path_windows: list[QWidget]
     plot_speed_windows: list[QWidget]
     mechanism: Mechanism
-    preview_window: DisplayImageWidget
+    preview_window: DisplayImageWidget | None
 
     def __init__(self):
         super().__init__()
@@ -45,6 +47,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.researchPathsButton.clicked.connect(self.set_trajectories_page)
         self.researchAnalogs.clicked.connect(self.set_speeds_page)
+
+        self.preview_window = None
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         if self.preview_window is not None:

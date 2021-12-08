@@ -7,8 +7,9 @@ import numpy as np
 # HSV bounds for extracting presented color from the frame in preparing process.
 # Is being used in get_bound_colors() method
 class HSV:
-    LOWER_RED = np.array([0, 211, 125])
-    UPPER_RED = np.array([255, 238, 168])
+    LOWER_RED = np.array([150, 80, 125])
+    UPPER_RED = np.array([255, 255, 255])
+
     LOWER_BLUE = np.array([102, 100, 32])
     UPPER_BLUE = np.array([149, 255, 255])
 
@@ -16,7 +17,10 @@ class HSV:
     UPPER_GREEN = np.array([80, 255, 255])
 
     LOWER_YELLOW = np.array([20, 90, 136])
-    UPPER_YELLOW = np.array([80, 255, 255])
+    UPPER_YELLOW = np.array([50, 255, 255])
+
+    LOWER_RED_L = np.array([0, 90, 136])
+    UPPER_RED_L = np.array([3, 255, 255])
 
 
 # Just colors preset in BGR (Blue--Green--Red) color scheme
@@ -39,8 +43,8 @@ MIN_POINTS_FOR_ELLIPSE = 4
 # Frame preparing settings. Preprocessing frame before looking for signatures in it
 MEDIAN_PREP_KERNEL = 5
 MEDIAN_BIN_KERNEL = 13
-MORPH_OPEN_KERNEL = np.ones((7, 7), np.uint8)
-MORPH_CLOSE_KERNEL = np.ones((9, 9), np.uint8)
+MORPH_OPEN_KERNEL = np.ones((3, 3), np.uint8)
+MORPH_CLOSE_KERNEL = np.ones((21, 21), np.uint8)
 
 JUMP_THRESHOLD = 200
 
@@ -52,16 +56,24 @@ MIN_FPS_REQUIRED = 25
 MIN_FRAMES_COUNT = 100
 
 
-# Just debugging mode flag, used in Mechanism creation. It allows to run Mechanism's methods in different modes
+# Just debugging mode flag, used in Mechanism creation. It allows running Mechanism's methods in different modes
 class DebugMode:
     DEBUG_OFF = 0
     DEBUG_VIDEO_SHOW = 1
     DEBUG_FULL = 2
 
 
-# Chose the right HSV color bounds to prepare frame for processing. It depends on link, which is being researching now
+# Chose the right HSV color bounds to prepare frame for processing. It depends on link, which is being researching now,
 # and it's predefined color
-def get_bound_colors(color: tuple[int, int, int]) -> tuple[np.ndarray, np.ndarray]:
+def get_bound_colors(
+        color: tuple[int, int, int],
+        alternative_red: bool = False,
+        color_bounds=None,
+) -> tuple[np.ndarray, np.ndarray]:
+    if alternative_red:
+        if all(color_bounds[0] == HSV.LOWER_RED):
+            return HSV.LOWER_RED_L, HSV.UPPER_RED_L
+
     return {
         BGR.RED: (HSV.LOWER_RED, HSV.UPPER_RED),
         BGR.BLUE: (HSV.LOWER_BLUE, HSV.UPPER_BLUE),
@@ -85,3 +97,5 @@ PREVIEW_POINT_TEXT_SHIFT = 10
 PREVIEW_POINT_FONT_SCALE = 1
 PREVIEW_WINDOW_W = 960
 PREVIEW_WINDOW_H = 540
+
+ARUCO_SCALING_DIAG_MM = 141.

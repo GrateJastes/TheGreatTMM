@@ -10,7 +10,9 @@ from src.windows.MainWindow import WindowMaker
 import pyqtgraph as pg
 
 
+
 def main():
+    # cv2.aruco.detectMarkers()
     app = QtWidgets.QApplication(sys.argv)
 
     window_maker = WindowMaker()
