@@ -28,24 +28,54 @@ class Link:
 
         self.color_bounds = consts.get_bound_colors(color)
 
-    def research_link(self, start_frame: np.ndarray) -> bool:
-        research_ok = True
+    def retry_with_low_red(self, start_frame) -> tuple:
+        frame = prepare_frame(start_frame, consts.get_bound_colors(self.color, True, self.color_bounds))
+        contours, _ = cv2.findContours(frame, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        if not contours:
+            return None, None
 
-        # First of all we preparing frame and converting it to binary image. It is made to research the current link's
+        signatures = find_marker_signatures(contours)
+        if not signatures:
+            return None, None
+
+        return contours, signatures
+
+    def research_link(self, start_frame: np.ndarray, last_scale: float) -> bool:
+        research_ok = True
+        got_contours_low_red = False
+        got_signatures_low_red = False
+
+        # First we're preparing frame and converting it to binary image. It is made to research the current link's
         # points only
         frame = prepare_frame(start_frame, self.color_bounds)
         # Finding each contour we can on the result image
         contours, _ = cv2.findContours(frame, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         if not contours:
-            research_ok = False
-            return research_ok
+            if self.color != consts.BGR.RED:
+                return False
+
+            contours, _ = self.retry_with_low_red(start_frame)
+            if not contours:
+                return False
+            else:
+                got_contours_low_red = True
 
         # Finding all signatures on the frame, which can be interpreted as link's points' markers. And representing
         # them as ellipses fitted to the contours
         signatures = find_marker_signatures(contours)
         if not signatures:
-            research_ok = False
-            return research_ok
+            if self.color != consts.BGR.RED or got_contours_low_red:
+                return False
+
+            _, signatures = self.retry_with_low_red(start_frame)
+            if not signatures:
+                return False
+            else:
+                got_signatures_low_red = True
+
+        if got_contours_low_red or got_signatures_low_red:
+            self.color_bounds = consts.get_bound_colors(self.color, True, self.color_bounds)
+            print(1)
 
         # Sorting found signatures by their area to discard small round-shaped interferences
         signatures.sort(key=ellipse_area, reverse=True)
@@ -54,18 +84,23 @@ class Link:
         # must calculate omega angle in this case.
         if self.is_initial:
             # Traversing coordinates, assuming origin marker as origin
-            marker = (int(signatures[0][0][0]), int(signatures[0][0][1]))
+            marker = (signatures[0][0][0], signatures[0][0][1])
+
+            if last_scale is not None:
+                marker = rescale(marker, last_scale)
+
+            marker = (int(marker[0]), int(marker[1]))
             # Adding current point to the Link's path
             self.points[0].path.append(marker)
             return research_ok
 
-        # If the link is not initial, it can contain several PoI. In this case we must research all of the signatures,
+        # If the link is not initial, it can contain several PoI. In this case we must research all the signatures,
         # to find relevant(s). Here we make markers (x and y list-pairs) from the signatures' ellipses
         markers = [(int(ellipse[0][0]), int(ellipse[0][1])) for ellipse in signatures]
 
         # Making list of the last dots to every PoI.
         last_dots = [point.path.last_dot_coords for point in self.points]
-        # Finding closest matches between the provided markers and the last dots on PoIs' paths
+        # Finding the closest matches between the provided markers and the last dots on PoIs' paths
         matches, rest_markers = self.__find_matches(last_dots, markers)
 
         # This condition means that we didn't find enough markers to describe all of the PoI on the Link. In current
@@ -79,7 +114,12 @@ class Link:
             if point.path.last_dot_coords == (None, None):
                 research_ok = True
                 try:
-                    point.path.append(next(rest_markers_iter))
+                    marker = next(rest_markers_iter)
+                    if last_scale is not None:
+                        marker = rescale(marker, last_scale)
+
+                    marker = (int(marker[0]), int(marker[1]))
+                    point.path.append(marker)
                 # If there is some PoI which isn't matched to any marker yet, but markers are already out, we
                 # must exit the cycle and drop the current frame's research for this Link.
                 except StopIteration:
@@ -89,7 +129,13 @@ class Link:
 
             # But if we have found the next dot to the point's path, we could append it and proceed further
             if point.path.last_dot_coords in matches.keys():
-                point.path.append(matches[point.path.last_dot_coords])
+                marker = matches[point.path.last_dot_coords]
+                if last_scale is not None:
+                    marker = rescale(marker, last_scale)
+
+                marker = (int(marker[0]), int(marker[1]))
+
+                point.path.append(marker)
                 research_ok = True
 
         return research_ok
@@ -107,7 +153,7 @@ class Link:
         # Only then we can append them to the final matches dictionary
         final_matches = {}  # markers to dots
 
-        # First of all we are looking for markers which are closest to every dot on the ends of the paths
+        # First we are looking for markers which are closest to every dot on the ends of the paths
         for last_dot in last_dots:
             if last_dot is None or last_dot[0] is None:
                 continue
@@ -136,18 +182,21 @@ class Link:
         for point in self.points:
             point.path.append((None, None))
 
-    def draw_on_frame(self, frame: np.ndarray, frame_num: int) -> None:
+    def draw_on_frame(self, frame: np.ndarray, frame_num: int, scale: float) -> None:
         for point in self.points:
             if len(point.path.dots) < frame_num + 1:
                 continue
-            point_coords = (
+            point_coords = rescale((
                 point.path.dots[frame_num].x,
                 point.path.dots[frame_num].y,
-            )
-            text_coords = (
+            ), 1. / scale)
+            text_coords = rescale((
                 point.path.dots[frame_num].x + consts.PREVIEW_POINT_TEXT_SHIFT,
                 point.path.dots[frame_num].y - consts.PREVIEW_POINT_TEXT_SHIFT,
-            )
+            ), 1. / scale)
+
+            point_coords = (int(point_coords[0]), int(point_coords[1]))
+            text_coords = (int(text_coords[0]), int(text_coords[1]))
 
             cv2.circle(
                 frame,

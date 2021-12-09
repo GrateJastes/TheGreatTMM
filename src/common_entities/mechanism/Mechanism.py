@@ -4,6 +4,7 @@ import numpy as np
 from scipy.optimize import fmin
 from scipy.spatial.distance import cdist
 from PyQt5.QtWidgets import QProgressBar
+
 from cv2 import cv2
 import cv2.aruco
 
@@ -12,7 +13,7 @@ from .Link import Link
 
 # noinspection PyTypeChecker
 from .. import Dot, Point
-from ...cv_module.cv_utils import distance, minimize
+from ...cv_module.cv_utils import distance, minimize, rescale
 
 
 class Mechanism:
@@ -24,9 +25,18 @@ class Mechanism:
     demo_frame_index: int
     preview_image: np.ndarray
 
+    aruco_dict: cv2.aruco_Dictionary
+    aruco_params: cv2.aruco_DetectorParameters
+    last_scale: float
+    first_scale: float
+    demo_frame_scale: float
+
     def __init__(self, path_to_file):
         self.video = cv2.VideoCapture(path_to_file)
         self.links = []
+
+        self.aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
+        self.aruco_params = cv2.aruco.DetectorParameters_create()
 
     def __del__(self):
         self.video.release()
@@ -63,9 +73,12 @@ class Mechanism:
                 point.point_analysis(initial_point)
 
     def process_video_input(self, progress_bar: QProgressBar = None):
+        scale_found = False
+        scaling_start_index = 0
+
         total_frames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
         frame_per_percent = int(total_frames / consts.PROGRESS_BAR_MAX)
-        frame_index = 0
+        frame_index = -1
 
         demo_frame_ready = False
         while True:
@@ -74,17 +87,24 @@ class Mechanism:
             frame_read, start_frame = self.video.read()
             if not frame_read:
                 break
+            frame_index += 1
+
+            self.refresh_scale(start_frame)
+            if self.last_scale is not None and not scale_found:
+                scale_found = True
+                self.first_scale = self.last_scale
+                scaling_start_index = frame_index
 
             # First we are researching the initial link. It has it's own property in the Mechanism class and is needed
             # to be researched to extract omega angle to further processing
-            initial_ok = self.initial_link.research_link(start_frame)
+            initial_ok = self.initial_link.research_link(start_frame, self.last_scale)
             if not initial_ok:
                 self.initial_link.miss_frame()
                 frame_is_full = False
 
             # Then we are researching the other links one by one
             for link in self.links:
-                link_ok = link.research_link(start_frame)
+                link_ok = link.research_link(start_frame, self.last_scale)
                 if not link_ok:
                     link.miss_frame()
                     frame_is_full = False
@@ -92,13 +112,42 @@ class Mechanism:
             if not demo_frame_ready and frame_is_full:
                 self.demo_frame = start_frame
                 self.demo_frame_index = frame_index
-                frame_is_full = True
+                self.demo_frame_scale = self.last_scale
 
-            frame_index += 1
             if frame_index % (frame_per_percent + 1) == 0 and progress_bar is not None:
                 progress_bar.setValue(frame_index / frame_per_percent)
 
         self.preview_image = self.get_preview_image()
+        self.rescale_links(scaling_start_index)
+
+    def rescale_links(self, scaling_start_index: int) -> None:
+        if self.first_scale is None or scaling_start_index == 0:
+            return
+
+        for i in range(scaling_start_index + 1):
+            base_dot = self.initial_link.points[0].path.dots[i]
+            new_base_coords = rescale((base_dot.x, base_dot.y), self.first_scale)
+            base_dot.x = new_base_coords[0]
+            base_dot.y = new_base_coords[1]
+
+            for link in self.links:
+                for point in link.points:
+                    dot = point.path.dots[i]
+                    new_coords = rescale((dot.x, dot.y), self.first_scale)
+                    dot.x = new_coords[0]
+                    dot.y = new_coords[1]
+
+    def refresh_scale(self, frame: np.ndarray) -> None:
+        markerCorners, markerIds, rejectedCandidates = \
+            cv2.aruco.detectMarkers(frame, self.aruco_dict, parameters=self.aruco_params)
+
+        if markerIds is None:
+            return
+
+        x = Dot(markerCorners[0][0][0][0], markerCorners[0][0][0][1])
+        y = Dot(markerCorners[0][0][2][0], markerCorners[0][0][2][1])
+
+        self.last_scale = consts.ARUCO_SCALING_DIAG_MM / distance(x, y)
 
     def first_circle_dots(self) -> list[Dot]:
         movement_started = False
@@ -185,10 +234,10 @@ class Mechanism:
                     dot.omega = self.initial_link.points[0].path.dots[i].omega
 
     def get_preview_image(self) -> np.ndarray:
-        self.initial_link.draw_on_frame(self.demo_frame, self.demo_frame_index)
+        self.initial_link.draw_on_frame(self.demo_frame, self.demo_frame_index, self.demo_frame_scale)
 
         for link in self.links:
-            link.draw_on_frame(self.demo_frame, self.demo_frame_index)
+            link.draw_on_frame(self.demo_frame, self.demo_frame_index, self.demo_frame_scale)
 
         width = self.video.get(3)
         height = self.video.get(4)
@@ -203,19 +252,19 @@ class Mechanism:
     @staticmethod
     def video_fits(filename: str) -> bool:
         return True
-        video = cv2.VideoCapture(filename)
-        try:
-            if not video.isOpened():
-                return False
-
-            fps = video.get(cv2.CAP_PROP_FPS)
-            if fps < consts.MIN_FPS_REQUIRED:
-                return False
-
-            total_frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
-            if total_frames < consts.MIN_FRAMES_COUNT:
-                return False
-
-            return True
-        finally:
-            video.release()
+        # video = cv2.VideoCapture(filename)
+        # try:
+        #     if not video.isOpened():
+        #         return False
+        #
+        #     fps = video.get(cv2.CAP_PROP_FPS)
+        #     if fps < consts.MIN_FPS_REQUIRED:
+        #         return False
+        #
+        #     total_frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
+        #     if total_frames < consts.MIN_FRAMES_COUNT:
+        #         return False
+        #
+        #     return True
+        # finally:
+        #     video.release()
