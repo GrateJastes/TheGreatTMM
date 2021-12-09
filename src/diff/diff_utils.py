@@ -39,7 +39,7 @@ def path_smoothing(point, base):
     x.append(x[0])
     y.append(y[0])
     xy = [x, y]
-    tck_x, ux = splprep(xy, s=2000, per=True)
+    tck_x, ux = splprep(xy, s=1000, per=True)
     new_points = splev(ux, tck_x)
     i = 0
     while i < len(new_points[0]):

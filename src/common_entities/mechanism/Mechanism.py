@@ -60,6 +60,7 @@ class Mechanism:
         self.find_origin(self.first_circle_dots())
         self.traverse_all_coordinates()
         self.find_all_omegas()
+        # self.peaks_removing()
 
         if progress_bar is not None:
             progress_bar.setValue(consts.PROGRESS_BAR_MAX)
@@ -268,3 +269,27 @@ class Mechanism:
         #     return True
         # finally:
         #     video.release()
+
+    def peaks_removing(self):
+        self.initial_link.points[0].restore_dots()
+        self.initial_link.points[0].remove_dot_repeat()
+        data = self.initial_link.points[0].path.dots
+        for prevdot, dot, nextdot in zip(data, data[1:], data[2:]):
+            ax, ay = nextdot.x - dot.x, nextdot.y - dot.y
+            bx, by = prevdot.x - dot.x, prevdot.y - dot.y
+            len_a, len_b = np.sqrt(ax ** 2 + ay ** 2), np.sqrt(bx ** 2 + by ** 2)
+            cos_ab = (ax * bx + ay * by) / (len_a * len_b)
+            angle = np.arccos(cos_ab)
+            if angle <= consts.MIN_ANGLE:
+                self.initial_link.points[0].path.dots.remove(dot)
+        for link in self.links:
+            for point in link.points:
+                data = point.path.dots
+                for prevdot, dot, nextdot in zip(data, data[1:], data[2:]):
+                    ax, ay = nextdot.x - dot.x, nextdot.y - dot.y
+                    bx, by = prevdot.x - dot.x, prevdot.y - dot.y
+                    len_a, len_b = np.sqrt(ax ** 2 + ay ** 2), np.sqrt(bx ** 2 + by ** 2)
+                    cos_ab = (ax * bx + ay * by) / (len_a * len_b)
+                    angle = np.arccos(cos_ab)
+                    if angle <= consts.MIN_ANGLE:
+                        dot.x, dot.y = None, None
