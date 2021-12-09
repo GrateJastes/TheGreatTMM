@@ -31,6 +31,8 @@ def crop_path(point, base):
 def path_smoothing(point, base):
     ip_point = common_entities.Point(point.name + '(ip)')
     dot_list = []
+    point.restore_dots()
+    base.restore_dots()
     point.remove_dot_repeat()
     base.remove_dot_repeat()
     x, y, base_x, base_y = crop_path(point, base)
