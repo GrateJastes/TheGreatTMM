@@ -40,107 +40,88 @@ class Link:
 
         return contours, signatures
 
-    def research_link(self, start_frame: np.ndarray, last_scale: float) -> bool:
-        research_ok = True
+    def research_link(self, start_frame: np.ndarray, last_scale: float, time_passed: float) -> bool:
+        dots_accepted = 0
         got_contours_low_red = False
         got_signatures_low_red = False
 
-        # First we're preparing frame and converting it to binary image. It is made to research the current link's
-        # points only
         frame = prepare_frame(start_frame, self.color_bounds)
-        # Finding each contour we can on the result image
         contours, _ = cv2.findContours(frame, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         if not contours:
             if self.color != consts.BGR.RED:
+                self.miss_frame()
                 return False
 
             contours, _ = self.retry_with_low_red(start_frame)
             if not contours:
+                self.miss_frame()
                 return False
             else:
                 got_contours_low_red = True
 
-        # Finding all signatures on the frame, which can be interpreted as link's points' markers. And representing
-        # them as ellipses fitted to the contours
         signatures = find_marker_signatures(contours)
         if not signatures:
             if self.color != consts.BGR.RED or got_contours_low_red:
+                self.miss_frame()
                 return False
 
             _, signatures = self.retry_with_low_red(start_frame)
             if not signatures:
+                self.miss_frame()
                 return False
             else:
                 got_signatures_low_red = True
 
         if got_contours_low_red or got_signatures_low_red:
             self.color_bounds = consts.get_bound_colors(self.color, True, self.color_bounds)
-            print(1)
 
-        # Sorting found signatures by their area to discard small round-shaped interferences
         signatures.sort(key=ellipse_area, reverse=True)
 
-        # If the researching link is the initial one, we know that it has only 1 point of interest. We also
-        # must calculate omega angle in this case.
         if self.is_initial:
-            # Traversing coordinates, assuming origin marker as origin
             marker = (signatures[0][0][0], signatures[0][0][1])
-
-            if last_scale is not None:
-                marker = rescale(marker, last_scale)
-
             marker = (int(marker[0]), int(marker[1]))
-            # Adding current point to the Link's path
-            self.points[0].path.append(marker)
-            return research_ok
 
-        # If the link is not initial, it can contain several PoI. In this case we must research all the signatures,
-        # to find relevant(s). Here we make markers (x and y list-pairs) from the signatures' ellipses
+            self.points[0].path.append(marker, last_scale, time_passed)
+
+            return True
+
         markers = [(int(ellipse[0][0]), int(ellipse[0][1])) for ellipse in signatures]
 
-        # Making list of the last dots to every PoI.
         last_dots = [point.path.last_dot_coords for point in self.points]
-        # Finding the closest matches between the provided markers and the last dots on PoIs' paths
         matches, rest_markers = self.__find_matches(last_dots, markers)
 
-        # This condition means that we didn't find enough markers to describe all of the PoI on the Link. In current
-        # version of the app we just discard whole frame for the Link in this case. TODO: research what we can
-        # if len(matches) + len(rest_markers) < len(self.points):
-        #     return False
-
-        # Finding markers for points which have no dots in their paths' yet.
         rest_markers_iter = iter(rest_markers)
         for point in self.points:
             if point.path.last_dot_coords == (None, None):
-                research_ok = True
                 try:
                     marker = next(rest_markers_iter)
-                    if last_scale is not None:
-                        marker = rescale(marker, last_scale)
 
                     marker = (int(marker[0]), int(marker[1]))
-                    point.path.append(marker)
-                # If there is some PoI which isn't matched to any marker yet, but markers are already out, we
-                # must exit the cycle and drop the current frame's research for this Link.
+                    point.path.append(marker, last_scale, time_passed)
+                    dots_accepted += 1
                 except StopIteration:
-                    point.path.append((None, None))
+                    pass
 
                 continue
 
-            # But if we have found the next dot to the point's path, we could append it and proceed further
             if point.path.last_dot_coords in matches.keys():
                 marker = matches[point.path.last_dot_coords]
-                if last_scale is not None:
-                    marker = rescale(marker, last_scale)
 
                 marker = (int(marker[0]), int(marker[1]))
 
-                point.path.append(marker)
-                research_ok = True
+                point.path.append(marker, last_scale, time_passed)
+                dots_accepted += 1
 
-        return research_ok
+        path_len_max = max([len(p.path.dots) for p in self.points])
+        for point in self.points:
+            if len(point.path.dots) < path_len_max:
+                point.path.append((None, None))
 
-    # Private method for local usage. Returns found matches (dict. markers to dots) and the rejected markers
+        if dots_accepted == len(self.points):
+            return True
+        else:
+            return False
+
     def __find_matches(self,
                        last_dots: list[tuple],
                        markers: list[tuple[int, int]]
@@ -183,6 +164,7 @@ class Link:
             point.path.append((None, None))
 
     def draw_on_frame(self, frame: np.ndarray, frame_num: int, scale: float) -> None:
+        print("drawing: ", self.link_id)
         for point in self.points:
             if len(point.path.dots) < frame_num + 1:
                 continue

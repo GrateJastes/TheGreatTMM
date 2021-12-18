@@ -79,7 +79,7 @@ class Mechanism:
         scaling_start_index = 0
 
         total_frames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
-        frame_per_percent = int(total_frames / consts.PROGRESS_BAR_MAX)
+        frame_per_percent = max([int(total_frames / consts.PROGRESS_BAR_MAX), 1])
         frame_index = -1
 
         demo_frame_ready = False
@@ -90,6 +90,7 @@ class Mechanism:
             if not frame_read:
                 break
             frame_index += 1
+            time_passed = frame_index / self.video.get(cv2.CAP_PROP_FPS)
 
             self.refresh_scale(start_frame)
             if self.last_scale is not None and not scale_found:
@@ -99,16 +100,14 @@ class Mechanism:
 
             # First we are researching the initial link. It has it's own property in the Mechanism class and is needed
             # to be researched to extract omega angle to further processing
-            initial_ok = self.initial_link.research_link(start_frame, self.last_scale)
+            initial_ok = self.initial_link.research_link(start_frame, self.last_scale, time_passed)
             if not initial_ok:
-                self.initial_link.miss_frame()
                 frame_is_full = False
 
             # Then we are researching the other links one by one
             for link in self.links:
-                link_ok = link.research_link(start_frame, self.last_scale)
+                link_ok = link.research_link(start_frame, self.last_scale, time_passed)
                 if not link_ok:
-                    link.miss_frame()
                     frame_is_full = False
 
             if not demo_frame_ready and frame_is_full:
@@ -116,9 +115,14 @@ class Mechanism:
                 self.demo_frame_index = frame_index
                 self.demo_frame_scale = self.last_scale
 
+                demo_frame_ready = True
+
             if frame_index % (frame_per_percent + 1) == 0 and progress_bar is not None:
                 progress_bar.setValue(frame_index / frame_per_percent)
 
+        if not demo_frame_ready:
+            print("bad footage")
+            raise ValueError
         self.preview_image = self.get_preview_image()
         self.rescale_links(scaling_start_index)
 
@@ -197,9 +201,8 @@ class Mechanism:
         return result_dots
 
     def find_origin(self, first_circle_dots: list[Dot]) -> None:
-        initial_dots = first_circle_dots
-        x = np.array([dot.x for dot in initial_dots])
-        y = np.array([dot.y for dot in initial_dots])
+        x = np.array([dot.x for dot in first_circle_dots])
+        y = np.array([dot.y for dot in first_circle_dots])
 
         xm = x.mean()
         ym = y.mean()
