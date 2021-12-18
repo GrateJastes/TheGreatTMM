@@ -12,6 +12,12 @@ class Path:
         self.dots = []
         self.last_dot_coords = (None, None)
 
-    def append(self, coords: tuple) -> None:
-        self.last_dot_coords = coords
+    def append(self, coords: tuple, scale: float = 1) -> None:
+        if coords != (None, None):
+            self.last_dot_coords = coords
+            coords = self.rescale(coords, scale)
+
         self.dots.append(AnalogDot((coords[0], coords[1]), None))
+
+    def rescale(self, coords, scale):
+        return coords[0] * scale, coords[1] * scale

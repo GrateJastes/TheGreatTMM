@@ -77,7 +77,7 @@ class Mechanism:
         scaling_start_index = 0
 
         total_frames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
-        frame_per_percent = int(total_frames / consts.PROGRESS_BAR_MAX)
+        frame_per_percent = max([int(total_frames / consts.PROGRESS_BAR_MAX), 1])
         frame_index = -1
 
         demo_frame_ready = False
@@ -99,14 +99,12 @@ class Mechanism:
             # to be researched to extract omega angle to further processing
             initial_ok = self.initial_link.research_link(start_frame, self.last_scale)
             if not initial_ok:
-                self.initial_link.miss_frame()
                 frame_is_full = False
 
             # Then we are researching the other links one by one
             for link in self.links:
                 link_ok = link.research_link(start_frame, self.last_scale)
                 if not link_ok:
-                    link.miss_frame()
                     frame_is_full = False
 
             if not demo_frame_ready and frame_is_full:
@@ -114,9 +112,14 @@ class Mechanism:
                 self.demo_frame_index = frame_index
                 self.demo_frame_scale = self.last_scale
 
+                demo_frame_ready = True
+
             if frame_index % (frame_per_percent + 1) == 0 and progress_bar is not None:
                 progress_bar.setValue(frame_index / frame_per_percent)
 
+        if not demo_frame_ready:
+            print("bad footage")
+            raise ValueError
         self.preview_image = self.get_preview_image()
         self.rescale_links(scaling_start_index)
 
