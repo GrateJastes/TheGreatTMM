@@ -5,3 +5,4 @@ assets
 **/__pycache__
 venv
 examples.py
+/dist/
