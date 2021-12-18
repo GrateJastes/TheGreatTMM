@@ -301,13 +301,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             point_plot = p0.plot(x=X,
                                  y=Y,
-                                 pen=pg.mkPen(consts.BGR.RED, width=1), 
-                                 symbol='o')
+                                 pen=pg.mkPen(consts.BGR.RED, width=1))
+
             point_plot_ip = p0.plot(x=[dot.x for dot in point.interpolated_path(base_point).dots],
                                     y=[dot.y for dot in point.interpolated_path(base_point).dots],
                                     pen=pg.mkPen('r', width=4), 
                                     symbol='o')
-
+            p0.setAspectLocked()
             legend = pg.LegendItem((80, 60))
             legend.setParentItem(p0)
             legend.addItem(point_plot, 'Распознанная траектория')

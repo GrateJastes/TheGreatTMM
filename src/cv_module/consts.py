@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # Here is file with most of constant values we will be using in the entire project. They can be divided into classes
 # or dictionaries to keep this file more structured
 
@@ -99,3 +100,5 @@ PREVIEW_WINDOW_W = 960
 PREVIEW_WINDOW_H = 540
 
 ARUCO_SCALING_DIAG_MM = 70.5
+
+MIN_ANGLE = np.pi / 2

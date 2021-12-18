@@ -42,6 +42,13 @@ class Point:
                 if i + k == len(self.path.dots):
                     self.fill_dots_none_end(i, k)
                 elif i == 0:
+                    if self.path.dots[i + k].x is None:
+                        j1 = i + k
+                        k1 = 1
+                        while (j1 < len(self.path.dots) - 1) and (self.path.dots[j1].x is None):
+                            j1 += 1
+                            k1 += 1
+                        self.fill_dots_end(i + k, k1)
                     self.fill_dots_none_beg(i, k)
                 else:
                     self.fill_dots_end(i, k)
@@ -70,29 +77,29 @@ class Point:
             j += 1
 
     def fill_dots_none_beg(self, first_occurrence, num_of_gaps):
-        delta_x = self.path.dots[first_occurrence + num_of_gaps].x \
-                  - self.path.dots[first_occurrence + num_of_gaps - 1].x
-        delta_y = self.path.dots[first_occurrence + num_of_gaps].y \
-                  - self.path.dots[first_occurrence + num_of_gaps - 1].y
+        delta_x = (self.path.dots[first_occurrence + num_of_gaps].x
+                   - self.path.dots[first_occurrence + num_of_gaps - 1].x)
+        delta_y = (self.path.dots[first_occurrence + num_of_gaps].y
+                   - self.path.dots[first_occurrence + num_of_gaps - 1].y)
         j = first_occurrence + num_of_gaps - 2
         while j >= first_occurrence:
-            self.path.dots[j].x = self.path.dots[first_occurrence + num_of_gaps - 1].x \
-                                  + delta_x * (first_occurrence + num_of_gaps - 1 - j)
-            self.path.dots[j].y = self.path.dots[first_occurrence + num_of_gaps - 1].y \
-                                  + delta_y * (first_occurrence + num_of_gaps - 1 - j)
+            self.path.dots[j].x = (self.path.dots[first_occurrence + num_of_gaps - 1].x
+                                   + delta_x * (first_occurrence + num_of_gaps - 1 - j))
+            self.path.dots[j].y = (self.path.dots[first_occurrence + num_of_gaps - 1].y
+                                   + delta_y * (first_occurrence + num_of_gaps - 1 - j))
             j -= 1
 
     def fill_dots_none_end(self, first_occurrence, num_of_gaps):
-        delta_x = self.path.dots[first_occurrence - 1].x \
-                  - self.path.dots[first_occurrence - 2].x
-        delta_y = self.path.dots[first_occurrence - 1].y \
-                  - self.path.dots[first_occurrence - 2].y
+        delta_x = (self.path.dots[first_occurrence - 1].x
+                   - self.path.dots[first_occurrence - 2].x)
+        delta_y = (self.path.dots[first_occurrence - 1].y
+                   - self.path.dots[first_occurrence - 2].y)
         j = first_occurrence
-        while j <= (first_occurrence + num_of_gaps - 2):
-            self.path.dots[j].x = self.path.dots[first_occurrence - 1].x \
-                                  + delta_x * (j - first_occurrence + 1)
-            self.path.dots[j].y = self.path.dots[first_occurrence - 1].y \
-                                  + delta_y * (j - first_occurrence + 1)
+        while j <= (first_occurrence + num_of_gaps - 1):
+            self.path.dots[j].x = (self.path.dots[first_occurrence - 1].x
+                                   + delta_x * (j - first_occurrence + 1))
+            self.path.dots[j].y = (self.path.dots[first_occurrence - 1].y
+                                   + delta_y * (j - first_occurrence + 1))
             j += 1
 
     def fill_dots_repeat_end(self, first_occurrence, num_of_gaps):
@@ -102,26 +109,13 @@ class Point:
         delta_y = difference_y / num_of_gaps
         j = first_occurrence
         while j <= (first_occurrence + num_of_gaps - 2):
-            self.path.dots[j].x = self.path.dots[first_occurrence - 1].x \
-                                  + delta_x * (j - first_occurrence + 1)
-            self.path.dots[j].y = self.path.dots[first_occurrence - 1].y \
-                                  + delta_y * (j - first_occurrence + 1)
+            self.path.dots[j].x = (self.path.dots[first_occurrence - 1].x
+                                   + delta_x * (j - first_occurrence + 1))
+            self.path.dots[j].y = (self.path.dots[first_occurrence - 1].y
+                                   + delta_y * (j - first_occurrence + 1))
             j += 1
 
-
-
     def remove_dot_repeat(self):
-        # print(self.name, ':', [(self.path.dots[i].x, self.path.dots[i].y) for i in range(len(self.path.dots))])
-        # if ((self.path.dots[0].x == self.path.dots[1].x)
-        #         and (self.path.dots[0].y == self.path.dots[1].y)):
-        #     j = i
-        #     k = 1
-        #     while ((j < len(self.path.dots) - 1)
-        #            and (self.path.dots[j].x == self.path.dots[j + 1].x)
-        #            and (self.path.dots[j].y == self.path.dots[j + 1].y)):
-        #         j += 1
-        #         k += 1
-
         for i in range(len(self.path.dots) - 1):
             if ((self.path.dots[i].x == self.path.dots[i + 1].x)
                     and (self.path.dots[i].y == self.path.dots[i + 1].y)):
@@ -136,7 +130,6 @@ class Point:
                     self.fill_dots_repeat_end(i, k)
                 else:
                     self.fill_dots_beg(i, k)
-                # print(self.name, i, [(self.path.dots[i].x, self.path.dots[i].y) for i in range(len(self.path.dots))])
 
     def get_coord_for_plot(self, coord_name: str) -> np.array:
         if coord_name == 'x':
