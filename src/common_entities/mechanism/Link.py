@@ -40,7 +40,7 @@ class Link:
 
         return contours, signatures
 
-    def research_link(self, start_frame: np.ndarray, last_scale: float) -> bool:
+    def research_link(self, start_frame: np.ndarray, last_scale: float, time_passed: float) -> bool:
         dots_accepted = 0
         got_contours_low_red = False
         got_signatures_low_red = False
@@ -81,7 +81,7 @@ class Link:
             marker = (signatures[0][0][0], signatures[0][0][1])
             marker = (int(marker[0]), int(marker[1]))
 
-            self.points[0].path.append(marker, last_scale)
+            self.points[0].path.append(marker, last_scale, time_passed)
 
             return True
 
@@ -97,7 +97,7 @@ class Link:
                     marker = next(rest_markers_iter)
 
                     marker = (int(marker[0]), int(marker[1]))
-                    point.path.append(marker, last_scale)
+                    point.path.append(marker, last_scale, time_passed)
                     dots_accepted += 1
                 except StopIteration:
                     pass
@@ -109,7 +109,7 @@ class Link:
 
                 marker = (int(marker[0]), int(marker[1]))
 
-                point.path.append(marker, last_scale)
+                point.path.append(marker, last_scale, time_passed)
                 dots_accepted += 1
 
         path_len_max = max([len(p.path.dots) for p in self.points])

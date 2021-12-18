@@ -19,9 +19,13 @@ class Dot:
 
 
 class AnalogDot(Dot):
-    def __init__(self, coords, omega):
+    omega: float
+    time: float
+
+    def __init__(self, coords, omega, time):
         super().__init__(coords[0], coords[1])
         self.omega = omega
+        self.time = time
 
     def set_self_omega(self):
         if self.x is None:

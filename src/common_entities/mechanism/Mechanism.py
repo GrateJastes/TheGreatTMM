@@ -88,6 +88,7 @@ class Mechanism:
             if not frame_read:
                 break
             frame_index += 1
+            time_passed = frame_index / self.video.get(cv2.CAP_PROP_FPS)
 
             self.refresh_scale(start_frame)
             if self.last_scale is not None and not scale_found:
@@ -97,13 +98,13 @@ class Mechanism:
 
             # First we are researching the initial link. It has it's own property in the Mechanism class and is needed
             # to be researched to extract omega angle to further processing
-            initial_ok = self.initial_link.research_link(start_frame, self.last_scale)
+            initial_ok = self.initial_link.research_link(start_frame, self.last_scale, time_passed)
             if not initial_ok:
                 frame_is_full = False
 
             # Then we are researching the other links one by one
             for link in self.links:
-                link_ok = link.research_link(start_frame, self.last_scale)
+                link_ok = link.research_link(start_frame, self.last_scale, time_passed)
                 if not link_ok:
                     frame_is_full = False
 
