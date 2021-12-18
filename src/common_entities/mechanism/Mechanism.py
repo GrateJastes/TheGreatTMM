@@ -199,9 +199,8 @@ class Mechanism:
         return result_dots
 
     def find_origin(self, first_circle_dots: list[Dot]) -> None:
-        initial_dots = first_circle_dots
-        x = np.array([dot.x for dot in initial_dots])
-        y = np.array([dot.y for dot in initial_dots])
+        x = np.array([dot.x for dot in first_circle_dots])
+        y = np.array([dot.y for dot in first_circle_dots])
 
         xm = x.mean()
         ym = y.mean()
