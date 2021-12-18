@@ -31,15 +31,12 @@ def crop_path(point, base):
 def path_smoothing(point, base):
     ip_point = common_entities.Point(point.name + '(ip)')
     dot_list = []
-    point.restore_dots()
-    base.restore_dots()
-    point.remove_dot_repeat()
-    base.remove_dot_repeat()
     x, y, base_x, base_y = crop_path(point, base)
     x.append(x[0])
     y.append(y[0])
+
     xy = [x, y]
-    tck_x, ux = splprep(xy, s=2000, per=True)
+    tck_x, ux = splprep(xy, s=50, per=True)
     new_points = splev(ux, tck_x)
     i = 0
     while i < len(new_points[0]):
