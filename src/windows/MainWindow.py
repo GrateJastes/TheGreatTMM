@@ -307,7 +307,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                     y=[dot.y for dot in point.interpolated_path(base_point).dots],
                                     pen=pg.mkPen('r', width=4), 
                                     symbol='o')
-
+            p0.setAspectLocked()
             legend = pg.LegendItem((80, 60))
             legend.setParentItem(p0)
             legend.addItem(point_plot, 'Распознанная траектория')
