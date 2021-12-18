@@ -59,9 +59,9 @@ class Mechanism:
         self.process_video_input(progress_bar)
         self.find_origin(self.first_circle_dots())
         self.traverse_all_coordinates()
-        self.find_all_omegas()
         # self.peaks_removing()
         self.points_optimization()
+        self.find_all_omegas()
 
         if progress_bar is not None:
             progress_bar.setValue(consts.PROGRESS_BAR_MAX)
