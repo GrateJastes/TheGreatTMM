@@ -61,6 +61,7 @@ class Mechanism:
         self.traverse_all_coordinates()
         self.find_all_omegas()
         # self.peaks_removing()
+        self.points_optimization()
 
         if progress_bar is not None:
             progress_bar.setValue(consts.PROGRESS_BAR_MAX)
@@ -293,3 +294,15 @@ class Mechanism:
                     angle = np.arccos(cos_ab)
                     if angle <= consts.MIN_ANGLE:
                         dot.x, dot.y = None, None
+
+    def points_optimization(self):
+        for link in self.links:
+            for point in link.points:
+                if len(point.path.dots) != len(self.initial_link.points[0].path.dots):
+                    print('path of different lengths:', point.name, self.initial_link.points[0].name)
+        self.initial_link.points[0].restore_dots()
+        self.initial_link.points[0].remove_dot_repeat()
+        for link in self.links:
+            for point in link.points:
+                point.restore_dots()
+                point.remove_dot_repeat()
