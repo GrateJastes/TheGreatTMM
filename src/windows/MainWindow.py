@@ -207,6 +207,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         return links
 
     def start_research(self):
+        self.back_button_4.hide()
         self.mechanism = Mechanism(self.videoFilePath.text())
         links = self.collect_links_data()
         for link in links:
