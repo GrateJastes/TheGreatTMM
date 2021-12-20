@@ -47,11 +47,9 @@ def find_marker_signatures(contours):
 
 
 def prepare_frame(frame, hsv_bounds):
-    # blurred = cv2.medianBlur(frame, consts.MEDIAN_PREP_KERNEL)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     binary = cv2.inRange(hsv, hsv_bounds[0], hsv_bounds[1])
 
-    # opened = cv2.morphologyEx(binary, cv2.MORPH_OPEN, consts.MORPH_OPEN_KERNEL)
     closed = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, consts.MORPH_CLOSE_KERNEL)
 
     smoothed = cv2.medianBlur(closed, consts.MEDIAN_BIN_KERNEL)

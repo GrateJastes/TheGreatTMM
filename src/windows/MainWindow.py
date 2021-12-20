@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import QFileDialog, QApplication, QMessageBox, QWidget, QVBoxLayout, QLabel, QHBoxLayout, \
     QPushButton, QComboBox, QCheckBox, QSpinBox
@@ -55,6 +56,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.preview_window.destroy()
         for window in self.plot_path_windows + self.plot_speed_windows:
             window.destroy()
+
         a0.accept()
 
     def set_screen_geometry(self) -> None:
