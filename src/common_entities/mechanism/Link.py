@@ -85,7 +85,13 @@ class Link:
 
             return True
 
-        markers = [(int(ellipse[0][0]), int(ellipse[0][1])) for ellipse in signatures]
+        ellipses = signatures
+        # ellipses = []
+        # for s in signatures:
+        #     if not any(np.isnan(s[0])) and not any(np.isinf(s[0])):
+        #         ellipses.append(s)
+
+        markers = [(int(ellipse[0][0]), int(ellipse[0][1])) for ellipse in ellipses]
 
         last_dots = [point.path.last_dot_coords for point in self.points]
         matches, rest_markers = self.__find_matches(last_dots, markers)
@@ -164,7 +170,6 @@ class Link:
             point.path.append((None, None))
 
     def draw_on_frame(self, frame: np.ndarray, frame_num: int, scale: float) -> None:
-        print("drawing: ", self.link_id)
         for point in self.points:
             if len(point.path.dots) < frame_num + 1:
                 continue
