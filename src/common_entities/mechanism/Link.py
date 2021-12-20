@@ -85,11 +85,10 @@ class Link:
 
             return True
 
-        ellipses = signatures
-        # ellipses = []
-        # for s in signatures:
-        #     if not any(np.isnan(s[0])) and not any(np.isinf(s[0])):
-        #         ellipses.append(s)
+        ellipses = []
+        for s in signatures:
+            if not any(np.isnan(s[0])) and not any(np.isinf(s[0])):
+                ellipses.append(s)
 
         markers = [(int(ellipse[0][0]), int(ellipse[0][1])) for ellipse in ellipses]
 
