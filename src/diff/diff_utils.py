@@ -174,15 +174,36 @@ def data_fit(data_list):
     return data_list_pol
 
 
-# Another way to smooth the resulting graphs (in progress)
-def data_interpolate(data_list):
-    omega_list = [item * consts.STEP_SPLITTING for item in range(len(data_list))]
-    omega_int = np.linspace(omega_list[0], omega_list[-1], 30)
-    tck_x = interpolate.splrep(omega_list, [unit.x for unit in data_list], k=3, s=1120)
-    int_x = interpolate.splev(omega_int, tck_x, der=0)
-    tck_y = interpolate.splrep(omega_list, [unit.y for unit in data_list], k=3, s=1120)
-    int_y = interpolate.splev(omega_int, tck_y, der=0)
-    data_list_pol = []
-    for i in range(len(data_list)):
-        data_list_pol.append(Unit(int_x[i], int_y[i]))
-    return data_list_pol
+# # Another way to smooth the resulting graphs (in progress)
+# def data_interpolate(data_list):
+#     omega_list = [item * consts.STEP_SPLITTING for item in range(len(data_list))]
+#     omega_int = np.linspace(omega_list[0], omega_list[-1], 30)
+#     tck_x = interpolate.splrep(omega_list, [unit.x for unit in data_list], k=5, s=0, per=True)
+#     int_x = interpolate.splev(omega_int, tck_x, der=0)
+#     tck_y = interpolate.splrep(omega_list, [unit.y for unit in data_list], k=5, s=0, per=True)
+#     int_y = interpolate.splev(omega_int, tck_y, der=0)
+#     data_list_pol = []
+#     for i in range(len(data_list)):
+#         data_list_pol.append(Unit(int_x[i], int_y[i]))
+#     return data_list_pol
+
+# # Another way to smooth the resulting graphs (in progress)
+# def data_interpolate(data_list):
+#     omega_list = [item * consts.STEP_SPLITTING for item in range(len(data_list))]
+#     omega_int = np.linspace(omega_list[0], omega_list[-1], 30)
+#     x = [unit.x for unit in data_list]
+#     y = [unit.y for unit in data_list]
+#     x_omega = [omega_list, x]
+#     y_omega = [omega_list, y]
+#     tck_x_local, omega_x = splprep(x_omega, s=300, per=True)
+#     int_x = splev(omega_x, tck_x_local)
+#     tck_y_local, omega_y = splprep(y_omega, s=300, per=True)
+#     int_y = splev(omega_y, tck_y_local)
+#     data_list_pol = []
+#     i = 0
+#     while i < len(int_x[0]):
+#         data_list_pol.append(Unit(int_x[1][i], int_y[1][i]))
+#         i += 1
+#     return data_list_pol
+
+
