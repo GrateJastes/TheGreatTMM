@@ -41,7 +41,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        self.setWindowTitle('The Great TMM')
+        self.setWindowTitle('Определение кинематических характеристик механизма')
 
         self.plot_path_windows = []
         self.plot_speed_windows = []
@@ -298,7 +298,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             plot_widget = pg.GraphicsLayoutWidget(show=True)
             pg.setConfigOptions(antialias=True)
 
-            p0 = plot_widget.addPlot(title='Point %s path' % point.name)
+            p0 = plot_widget.addPlot(title='Траектория точки %s' % point.name)
             X = point.get_coord_for_plot('x')
             Y = point.get_coord_for_plot('y')
 
