@@ -301,10 +301,10 @@ class Mechanism:
         #             inext += 1
 
     def points_optimization(self):
-        for link in self.links:
-            for point in link.points:
-                if len(point.path.dots) != len(self.initial_link.points[0].path.dots):
-                    print('path of different lengths:', point.name, self.initial_link.points[0].name)
+        # for link in self.links:
+            # for point in link.points:
+                # if len(point.path.dots) != len(self.initial_link.points[0].path.dots):
+                    # print('path of different lengths:', point.name, self.initial_link.points[0].name)
         self.initial_link.points[0].restore_dots()
         self.initial_link.points[0].remove_dot_repeat()
         for link in self.links:
