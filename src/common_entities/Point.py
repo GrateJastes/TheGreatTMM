@@ -142,3 +142,21 @@ class Point:
             return np.array([dot.x if dot.x is not None else np.nan for dot in self.path.dots])
         else:
             return np.array([dot.y if dot.y is not None else np.nan for dot in self.path.dots])
+
+    def fill_peak(self, iprev, i, inext, data):
+        ax, ay = data[inext].x - data[i].x, data[inext].y - data[i].y
+        bx, by = data[iprev].x - data[i].x, data[iprev].y - data[i].y
+        len_a, len_b = np.sqrt(ax ** 2 + ay ** 2), np.sqrt(bx ** 2 + by ** 2)
+        cos_ab = (ax * bx + ay * by) / (len_a * len_b)
+        angle = np.arccos(cos_ab)
+        if angle <= diff_consts.MIN_ANGLE:
+            prev_dot = (self.path.dots[iprev].x,
+                        self.path.dots[iprev].y)
+            next_dot = (self.path.dots[inext].x,
+                        self.path.dots[inext].y)
+            self.path.dots[i].x = (prev_dot[0] + next_dot[0]) / 2
+            self.path.dots[i].y = (prev_dot[1] + next_dot[1]) / 2
+            data[i].x = (prev_dot[0] + next_dot[0]) / 2
+            data[i].y = (prev_dot[1] + next_dot[1]) / 2
+            return data, True
+        return data, False

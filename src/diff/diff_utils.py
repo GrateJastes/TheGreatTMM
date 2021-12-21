@@ -1,7 +1,6 @@
 import math
 
 import numpy as np
-from scipy import interpolate
 from scipy.interpolate import splprep, splev
 
 from src import common_entities
@@ -100,16 +99,6 @@ def diff1(point, base):
     return v_list_pol
 
 
-def diff1_without_fit(point, base):
-    ip_dot_list = linear_interpolate(point, base)
-    v_list = [Unit(extreme_difference_1(ip_dot_list, 'x'), extreme_difference_1(ip_dot_list, 'y'))]
-    for i in range(1, len(ip_dot_list.path.dots) - 1):
-        v_list.append(Unit(central_difference_1(ip_dot_list, i, 'x'),
-                           central_difference_1(ip_dot_list, i, 'y')))
-    v_list.append(Unit(extreme_difference_1(ip_dot_list, 'x'), extreme_difference_1(ip_dot_list, 'y')))
-    return v_list
-
-
 def central_difference_2(ip_point, num, type_of_coord):
     difference = None
     if type_of_coord == 'x':
@@ -146,15 +135,6 @@ def diff2(point, base):
     return a_list_pol
 
 
-def diff2_without_fit(point, base):
-    ip_dot_list = linear_interpolate(point, base)
-    a_list = [Unit(extreme_difference_2(ip_dot_list, 'x'), extreme_difference_2(ip_dot_list, 'y'))]
-    for num in range(1, len(ip_dot_list.path.dots) - 1):
-        a_list.append(Unit(central_difference_2(ip_dot_list, num, 'x'), central_difference_2(ip_dot_list, num, 'y')))
-    a_list.append(Unit(extreme_difference_2(ip_dot_list, 'x'), extreme_difference_2(ip_dot_list, 'y')))
-    return a_list
-
-
 # Returns a polynomial function of dependence of y on x
 def polinom(x, y):
     z = np.polyfit(x, y, consts.DEGREE_OF_POLYNOMIAL)
@@ -171,18 +151,4 @@ def data_fit(data_list):
     data_list_pol = []
     for i in range(len(data_list)):
         data_list_pol.append(Unit(fx(i * consts.STEP_SPLITTING), fy(i * consts.STEP_SPLITTING)))
-    return data_list_pol
-
-
-# Another way to smooth the resulting graphs (in progress)
-def data_interpolate(data_list):
-    omega_list = [item * consts.STEP_SPLITTING for item in range(len(data_list))]
-    omega_int = np.linspace(omega_list[0], omega_list[-1], 30)
-    tck_x = interpolate.splrep(omega_list, [unit.x for unit in data_list], k=3, s=1120)
-    int_x = interpolate.splev(omega_int, tck_x, der=0)
-    tck_y = interpolate.splrep(omega_list, [unit.y for unit in data_list], k=3, s=1120)
-    int_y = interpolate.splev(omega_int, tck_y, der=0)
-    data_list_pol = []
-    for i in range(len(data_list)):
-        data_list_pol.append(Unit(int_x[i], int_y[i]))
     return data_list_pol
